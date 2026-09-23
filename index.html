@@ -279,37 +279,109 @@ input[type="text"]{
   background:var(--soft);
 }
 
-.measureGrid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:12px;
+.measureSection{
+  margin-top:16px;
 }
-.measureField label{
-  display:block;
+.measureSectionTitle{
   font-size:12px;
-  font-weight:700;
+  font-weight:800;
   color:var(--sub);
-  margin-bottom:6px;
+  margin-bottom:8px;
+  letter-spacing:.01em;
 }
-.measureField input{
+.measureStack{
+  display:grid;
+  gap:8px;
+}
+.measureControl{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  min-height:52px;
+  border:1px solid var(--line);
+  border-radius:15px;
+  background:var(--bg);
+  overflow:hidden;
+  transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.measureControl:focus-within{
+  border-color:var(--accent);
+  box-shadow:0 0 0 2px var(--accentSoft);
+}
+.measureNumber{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  padding-left:13px;
+}
+.measureIndex{
+  flex:none;
+  width:22px;
+  height:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:7px;
+  background:var(--soft);
+  color:var(--sub);
+  font-size:11px;
+  font-weight:800;
+}
+.measureControl input{
+  min-width:0;
   width:100%;
+  border:0!important;
+  outline:0;
+  box-shadow:none!important;
+  background:transparent!important;
+  padding:13px 4px!important;
+  border-radius:0!important;
+  font-size:18px;
+  font-weight:750;
+  color:var(--text);
+}
+.measureControl input::placeholder{
+  color:var(--sub);
+  font-weight:500;
+  opacity:.65;
+}
+.measureControl select{
+  align-self:stretch;
+  min-width:92px;
+  max-width:125px;
+  border:0;
+  border-left:1px solid var(--line);
+  outline:0;
+  background:var(--soft);
+  color:var(--text);
+  padding:0 30px 0 13px;
+  font:inherit;
+  font-weight:750;
+  appearance:auto;
+}
+.measureHint{
+  margin-top:7px;
+  font-size:11px;
+  color:var(--sub);
+  line-height:1.45;
 }
 .historyMeasure{
   display:flex;
   flex-wrap:wrap;
   gap:6px;
-  margin-top:6px;
+  margin-top:7px;
 }
 .measureBadge{
-  display:inline-block;
+  display:inline-flex;
+  align-items:center;
   background:var(--accentSoft);
   color:var(--text);
   border:1px solid var(--line);
   border-radius:999px;
-  padding:4px 8px;
+  padding:5px 9px;
   font-size:12px;
-  font-weight:700;
+  font-weight:800;
 }
 </style>
 </head>
@@ -352,15 +424,25 @@ input[type="text"]{
     <div id="activityChips" class="chips"></div>
     <input id="activity" type="text" maxlength="60" placeholder="選ぶか、自由に入力" style="margin-top:10px">
 
-    <div class="measureGrid">
-      <div class="measureField">
-        <label for="durationMin">時間（分・任意）</label>
-        <input id="durationMin" type="number" inputmode="numeric" min="0" max="99999" step="1" placeholder="例：30">
+    <div class="measureSection">
+      <div class="measureSectionTitle">時間・回数など <span style="font-weight:600">（任意）</span></div>
+      <div class="measureStack">
+        <div class="measureControl">
+          <div class="measureNumber">
+            <span class="measureIndex">1</span>
+            <input id="measure1Value" type="number" inputmode="decimal" min="0" step="any" placeholder="数値">
+          </div>
+          <select id="measure1Unit" aria-label="1つ目の単位"></select>
+        </div>
+        <div class="measureControl">
+          <div class="measureNumber">
+            <span class="measureIndex">2</span>
+            <input id="measure2Value" type="number" inputmode="decimal" min="0" step="any" placeholder="数値">
+          </div>
+          <select id="measure2Unit" aria-label="2つ目の単位"></select>
+        </div>
       </div>
-      <div class="measureField">
-        <label for="activityCount">回数（任意）</label>
-        <input id="activityCount" type="number" inputmode="numeric" min="0" max="999999" step="1" placeholder="例：20">
-      </div>
+      <div class="measureHint">例：30 分、5 km、20 回。必要なものだけ入力できます。</div>
     </div>
 
     <div class="question" style="margin-top:18px">これをやったら、何が少しマシになりそう？</div>
@@ -449,14 +531,23 @@ input[type="text"]{
     <div class="label">実施項目</div>
     <input id="editActivity" type="text" maxlength="60">
 
-    <div class="measureGrid">
-      <div class="measureField">
-        <label for="editDurationMin">時間（分）</label>
-        <input id="editDurationMin" type="number" inputmode="numeric" min="0" max="99999" step="1">
-      </div>
-      <div class="measureField">
-        <label for="editActivityCount">回数</label>
-        <input id="editActivityCount" type="number" inputmode="numeric" min="0" max="999999" step="1">
+    <div class="measureSection">
+      <div class="measureSectionTitle">時間・回数など</div>
+      <div class="measureStack">
+        <div class="measureControl">
+          <div class="measureNumber">
+            <span class="measureIndex">1</span>
+            <input id="editMeasure1Value" type="number" inputmode="decimal" min="0" step="any" placeholder="数値">
+          </div>
+          <select id="editMeasure1Unit" aria-label="編集する1つ目の単位"></select>
+        </div>
+        <div class="measureControl">
+          <div class="measureNumber">
+            <span class="measureIndex">2</span>
+            <input id="editMeasure2Value" type="number" inputmode="decimal" min="0" step="any" placeholder="数値">
+          </div>
+          <select id="editMeasure2Unit" aria-label="編集する2つ目の単位"></select>
+        </div>
       </div>
     </div>
 
@@ -487,7 +578,7 @@ input[type="text"]{
   <button id="backButton" class="backButton" type="button">← 戻る</button>
   <h1 style="margin-top:4px">オプション</h1>
   <p class="sub">よく使う項目と、前後の候補を編集できます。</p>
-  <p class="small">バージョン：2026.09.24-5</p>
+  <p class="small">バージョン：2026.09.24-8</p>
 
 
   <section class="card">
@@ -515,6 +606,22 @@ input[type="text"]{
       <button id="cancelRestoreButton" class="secondary" type="button">キャンセル</button>
     </div>
     <div id="backupStatus" class="small" style="margin-top:10px"></div>
+  </section>
+
+
+  <section class="card">
+    <div class="label">UNITS</div>
+    <div class="question" style="font-size:17px">単位</div>
+    <div id="unitOptionList"></div>
+
+    <div class="addRow">
+      <input id="newUnitOption" type="text" maxlength="20" placeholder="例：分、km、ページ">
+      <button id="addUnitOptionButton" type="button">追加</button>
+    </div>
+    <p class="small">
+      ここで追加・編集・削除・並び替えた単位が、STEP1とヒストリー編集の単位選択に反映されます。
+      過去の記録に使われている単位を削除しても、その記録自体は残ります。
+    </p>
   </section>
 
   <section class="card">
@@ -564,6 +671,7 @@ input[type="text"]{
   var ACTIVITY_KEY = "sukoshi_mashi_activity_options_v1";
   var DRAFT_KEY = "sukoshi_mashi_active_draft_v1";
   var THEME_KEY = "sukoshi_mashi_theme_v1";
+  var UNIT_KEY = "sukoshi_mashi_measure_units_v1";
 
   var defaultBeforeOptions = [
     "安心しそう","少し進みそう","理解が深まりそう",
@@ -576,6 +684,172 @@ input[type="text"]{
   ];
 
   var defaultActivityOptions = ["英語","勉強","筋トレ","仕事","読書","散歩"];
+
+  var DEFAULT_MEASURE_UNITS = ["分","時間","回","km","m","ページ","問","セット","冊","個"];
+
+  function readMeasureUnits(){
+    if(!storageOK) return DEFAULT_MEASURE_UNITS.slice();
+    try{
+      var raw = localStorage.getItem(UNIT_KEY);
+      if(!raw) return DEFAULT_MEASURE_UNITS.slice();
+      var arr = JSON.parse(raw);
+      if(!Array.isArray(arr)) return DEFAULT_MEASURE_UNITS.slice();
+
+      var clean = [];
+      for(var i=0;i<arr.length;i++){
+        var v = trimText(arr[i]);
+        if(v && clean.indexOf(v)===-1) clean.push(v);
+      }
+      return clean;
+    }catch(e){
+      return DEFAULT_MEASURE_UNITS.slice();
+    }
+  }
+
+  function writeMeasureUnits(arr){
+    if(!storageOK) return false;
+    try{
+      var clean = [];
+      for(var i=0;i<arr.length;i++){
+        var v = trimText(arr[i]);
+        if(v && clean.indexOf(v)===-1) clean.push(v);
+      }
+      localStorage.setItem(UNIT_KEY,JSON.stringify(clean));
+      return true;
+    }catch(e){
+      return false;
+    }
+  }
+
+  function populateUnitSelect(selectId, defaultUnit, preserveUnit){
+    var s = el(selectId);
+    if(!s) return;
+    s.innerHTML = "";
+
+    var units = readMeasureUnits();
+    var preserved = trimText(preserveUnit || "");
+
+    // 過去の記録で使われた削除済み単位は、編集時だけ一時的に選択肢へ残す。
+    if(preserved && units.indexOf(preserved)===-1){
+      units = units.slice();
+      units.push(preserved);
+    }
+
+    if(units.length===0){
+      var empty = document.createElement("option");
+      empty.value = "";
+      empty.textContent = "単位なし";
+      s.appendChild(empty);
+      s.value = "";
+      return;
+    }
+
+    for(var i=0;i<units.length;i++){
+      var o = document.createElement("option");
+      o.value = units[i];
+      o.textContent = units[i];
+      s.appendChild(o);
+    }
+
+    var candidate = preserved || defaultUnit || units[0];
+    s.value = units.indexOf(candidate)>=0 ? candidate : units[0];
+  }
+
+  function parseMeasureValue(v){
+    var n = Number(v);
+    return isFinite(n) && n >= 0 ? n : null;
+  }
+
+  function formatMeasureNumber(n){
+    if(Math.abs(n-Math.round(n)) < 0.0000001) return String(Math.round(n));
+    return String(Math.round(n*100)/100);
+  }
+
+  function getRecordMeasures(record){
+    var arr = [];
+
+    if(record.measure1Value !== undefined && record.measure1Value !== null &&
+       trimText(record.measure1Value) !== ""){
+      var n1 = parseMeasureValue(record.measure1Value);
+      if(n1 !== null) arr.push({value:n1,unit:record.measure1Unit || "分"});
+    }
+
+    if(record.measure2Value !== undefined && record.measure2Value !== null &&
+       trimText(record.measure2Value) !== ""){
+      var n2 = parseMeasureValue(record.measure2Value);
+      if(n2 !== null) arr.push({value:n2,unit:record.measure2Unit || "回"});
+    }
+
+    // Backward compatibility with v5 records.
+    if(arr.length===0){
+      if(record.durationMin !== undefined && record.durationMin !== null &&
+         trimText(record.durationMin) !== ""){
+        var dm = parseMeasureValue(record.durationMin);
+        if(dm !== null) arr.push({value:dm,unit:"分"});
+      }
+      if(record.activityCount !== undefined && record.activityCount !== null &&
+         trimText(record.activityCount) !== ""){
+        var ac = parseMeasureValue(record.activityCount);
+        if(ac !== null) arr.push({value:ac,unit:"回"});
+      }
+    }
+
+    return arr;
+  }
+
+  function sumMeasures(records){
+    var totals = {};
+    for(var i=0;i<records.length;i++){
+      var record = records[i].record ? records[i].record : records[i];
+      var measures = getRecordMeasures(record);
+      for(var j=0;j<measures.length;j++){
+        var u = measures[j].unit;
+        totals[u] = (totals[u] || 0) + measures[j].value;
+      }
+    }
+    return totals;
+  }
+
+  function renderUnitSummary(container, records, titleText){
+    var totals = sumMeasures(records);
+    var units = [];
+    for(var k in totals){
+      if(Object.prototype.hasOwnProperty.call(totals,k)) units.push(k);
+    }
+    if(units.length===0) return;
+
+    var unitOrder = readMeasureUnits();
+    units.sort(function(a,b){
+      var ai = unitOrder.indexOf(a);
+      var bi = unitOrder.indexOf(b);
+      if(ai===-1 && bi===-1) return a.localeCompare(b,"ja");
+      if(ai===-1) return 1;
+      if(bi===-1) return -1;
+      return ai-bi;
+    });
+
+    var wrap = document.createElement("div");
+    wrap.className = "unitSummary";
+
+    var title = document.createElement("div");
+    title.className = "unitSummaryTitle";
+    title.textContent = titleText || "量の合計";
+    wrap.appendChild(title);
+
+    var items = document.createElement("div");
+    items.className = "unitSummaryItems";
+
+    for(var i=0;i<units.length;i++){
+      var unit = units[i];
+      var badge = document.createElement("span");
+      badge.className = "unitTotalBadge";
+      badge.textContent = formatMeasureNumber(totals[unit]) + unit;
+      items.appendChild(badge);
+    }
+
+    wrap.appendChild(items);
+    container.appendChild(wrap);
+  }
 
   var beforeValue = "";
   var afterValue = "";
@@ -849,8 +1123,10 @@ input[type="text"]{
     try{
       var draft = {
         activity: trimText(el("activity").value),
-        durationMin: trimText(el("durationMin").value),
-        activityCount: trimText(el("activityCount").value),
+        measure1Value: trimText(el("measure1Value").value),
+        measure1Unit: el("measure1Unit").value,
+        measure2Value: trimText(el("measure2Value").value),
+        measure2Unit: el("measure2Unit").value,
         before: beforeValue || trimText(el("beforeCustom").value) || "未記入",
         startedAt: startedAt || new Date().toISOString()
       };
@@ -872,8 +1148,17 @@ input[type="text"]{
       if(!d || !d.activity) return;
 
       el("activity").value = String(d.activity).slice(0,60);
-      el("durationMin").value = d.durationMin != null ? String(d.durationMin).slice(0,8) : "";
-      el("activityCount").value = d.activityCount != null ? String(d.activityCount).slice(0,8) : "";
+      if(d.measure1Value !== undefined){
+        el("measure1Value").value = d.measure1Value != null ? String(d.measure1Value).slice(0,12) : "";
+        el("measure1Unit").value = MEASURE_UNITS.indexOf(d.measure1Unit)>=0 ? d.measure1Unit : "分";
+        el("measure2Value").value = d.measure2Value != null ? String(d.measure2Value).slice(0,12) : "";
+        el("measure2Unit").value = MEASURE_UNITS.indexOf(d.measure2Unit)>=0 ? d.measure2Unit : "回";
+      }else{
+        el("measure1Value").value = d.durationMin != null ? String(d.durationMin).slice(0,12) : "";
+        populateUnitSelect("measure1Unit","分","分");
+        el("measure2Value").value = d.activityCount != null ? String(d.activityCount).slice(0,12) : "";
+        populateUnitSelect("measure2Unit","回","回");
+      }
       beforeValue = String(d.before || "未記入").slice(0,80);
       startedAt = d.startedAt || new Date().toISOString();
 
@@ -1065,6 +1350,27 @@ input[type="text"]{
     }
   }
 
+
+  function renderUnitOptionList(){
+    var vals = readMeasureUnits();
+
+    renderEditableList(
+      "unitOptionList",
+      vals,
+      writeMeasureUnits,
+      function(){
+        renderUnitOptionList();
+        populateUnitSelect("measure1Unit","分");
+        populateUnitSelect("measure2Unit","回");
+
+        var edit1 = trimText(el("editMeasure1Unit") ? el("editMeasure1Unit").value : "");
+        var edit2 = trimText(el("editMeasure2Unit") ? el("editMeasure2Unit").value : "");
+        populateUnitSelect("editMeasure1Unit","分",edit1);
+        populateUnitSelect("editMeasure2Unit","回",edit2);
+      }
+    );
+  }
+
   function renderActivityOptionList(){
     var vals = readActivityOptions();
     renderEditableList(
@@ -1112,8 +1418,10 @@ input[type="text"]{
     scoreValue = 0;
     startedAt = "";
     el("activity").value = "";
-    el("durationMin").value = "";
-    el("activityCount").value = "";
+    el("measure1Value").value = "";
+    populateUnitSelect("measure1Unit","分");
+    el("measure2Value").value = "";
+    populateUnitSelect("measure2Unit","回");
     el("beforeCustom").value = "";
     el("afterCustom").value = "";
     clearSelectedChips("activityChips");
@@ -1154,10 +1462,19 @@ input[type="text"]{
 
     editingId = String(found.id);
     el("editActivity").value = found.activity || "";
-    el("editDurationMin").value =
-      found.durationMin !== undefined && found.durationMin !== null ? found.durationMin : "";
-    el("editActivityCount").value =
-      found.activityCount !== undefined && found.activityCount !== null ? found.activityCount : "";
+    var editMeasures = getRecordMeasures(found);
+    el("editMeasure1Value").value = editMeasures[0] ? editMeasures[0].value : "";
+    populateUnitSelect(
+      "editMeasure1Unit",
+      "分",
+      editMeasures[0] ? editMeasures[0].unit : "分"
+    );
+    el("editMeasure2Value").value = editMeasures[1] ? editMeasures[1].value : "";
+    populateUnitSelect(
+      "editMeasure2Unit",
+      "回",
+      editMeasures[1] ? editMeasures[1].unit : "回"
+    );
     el("editBefore").value = found.before || "";
     el("editAfter").value = found.after || "";
     setEditScore(Number(found.score)||0);
@@ -1330,23 +1647,17 @@ input[type="text"]{
         top.appendChild(time);
         item.appendChild(top);
 
-        if((x.durationMin !== undefined && trimText(x.durationMin) !== "") ||
-           (x.activityCount !== undefined && trimText(x.activityCount) !== "")){
+        var recordMeasures = getRecordMeasures(x);
+        if(recordMeasures.length){
           var measures = document.createElement("div");
           measures.className = "historyMeasure";
 
-          if(x.durationMin !== undefined && trimText(x.durationMin) !== ""){
-            var durationBadge = document.createElement("span");
-            durationBadge.className = "measureBadge";
-            durationBadge.textContent = trimText(x.durationMin)+"分";
-            measures.appendChild(durationBadge);
-          }
-
-          if(x.activityCount !== undefined && trimText(x.activityCount) !== ""){
-            var countBadge = document.createElement("span");
-            countBadge.className = "measureBadge";
-            countBadge.textContent = trimText(x.activityCount)+"回";
-            measures.appendChild(countBadge);
+          for(var rm=0;rm<recordMeasures.length;rm++){
+            var measureBadge = document.createElement("span");
+            measureBadge.className = "measureBadge";
+            measureBadge.textContent =
+              formatMeasureNumber(recordMeasures[rm].value)+recordMeasures[rm].unit;
+            measures.appendChild(measureBadge);
           }
 
           item.appendChild(measures);
@@ -1547,6 +1858,7 @@ input[type="text"]{
 
     var maxCount = entries[0].count;
     appendCategoryLines(content,entries,maxCount,"");
+    renderUnitSummary(content,records,"全期間の量");
   }
 
   function renderPeriodStats(records,mode){
@@ -1594,12 +1906,20 @@ input[type="text"]{
         if(Object.prototype.hasOwnProperty.call(cumulative,k)) snapshot[k]=cumulative[k];
       }
 
+      var cumulativeRecords = [];
+      for(var cr=0;cr<records.length;cr++){
+        var crKey = mode==="daily" ? dayKeyFromDate(records[cr].date) : monthKeyFromDate(records[cr].date);
+        if(crKey <= key) cumulativeRecords.push(records[cr]);
+      }
+
       periodBlocks.push({
         key:key,
         periodCount:periodRecords.length,
         cumulativeTotal:cumulativeTotal,
         counts:snapshot,
-        added:addedCounts
+        added:addedCounts,
+        periodRecords:periodRecords.slice(),
+        cumulativeRecords:cumulativeRecords
       });
     }
 
@@ -1665,6 +1985,8 @@ input[type="text"]{
         wrap.appendChild(line);
       }
 
+      renderUnitSummary(wrap,block.periodRecords,"この期間の量");
+      renderUnitSummary(wrap,block.cumulativeRecords,"累積の量");
       content.appendChild(wrap);
     }
   }
@@ -1722,6 +2044,8 @@ input[type="text"]{
     var entries = sortedCategoryEntries(counts);
     var maxCount = entries.length ? entries[0].count : 1;
     appendCategoryLines(detail, entries, maxCount, "");
+
+    renderUnitSummary(detail,dayRecords,"この日の量");
 
     var total = document.createElement("div");
     total.className = "small";
@@ -1892,6 +2216,7 @@ input[type="text"]{
       beforeOptions:readBeforeOptions(),
       afterOptions:readAfterOptions(),
       theme:readTheme(),
+      measureUnits:readMeasureUnits(),
       activeDraft:draft
     };
   }
@@ -1986,6 +2311,10 @@ input[type="text"]{
       localStorage.setItem(BEFORE_KEY,JSON.stringify(pendingRestoreData.beforeOptions));
       localStorage.setItem(AFTER_KEY,JSON.stringify(pendingRestoreData.afterOptions));
 
+      if(Array.isArray(pendingRestoreData.measureUnits)){
+        localStorage.setItem(UNIT_KEY,JSON.stringify(pendingRestoreData.measureUnits));
+      }
+
       var restoredTheme = THEMES[pendingRestoreData.theme] ? pendingRestoreData.theme : "graphite";
       localStorage.setItem(THEME_KEY,restoredTheme);
 
@@ -2003,6 +2332,11 @@ input[type="text"]{
       renderActivityChips();
       renderBeforeChips();
       renderAfterChips();
+      renderUnitOptionList();
+      populateUnitSelect("measure1Unit","分");
+      populateUnitSelect("measure2Unit","回");
+      populateUnitSelect("editMeasure1Unit","分");
+      populateUnitSelect("editMeasure2Unit","回");
       renderHistory();
       renderStreaks();
       renderActivityOptionList();
@@ -2034,6 +2368,7 @@ input[type="text"]{
     el("statsScreen").className = "hidden";
     el("optionsScreen").className = "";
     renderThemeOptions();
+    renderUnitOptionList();
     renderActivityOptionList();
     renderBeforeOptionList();
     renderAfterOptionList();
@@ -2101,8 +2436,10 @@ input[type="text"]{
     var entry = {
       id:String(now.getTime()),
       activity:trimText(el("activity").value)||"未記入",
-      durationMin:trimText(el("durationMin").value),
-      activityCount:trimText(el("activityCount").value),
+      measure1Value:trimText(el("measure1Value").value),
+      measure1Unit:el("measure1Unit").value,
+      measure2Value:trimText(el("measure2Value").value),
+      measure2Unit:el("measure2Unit").value,
       before:beforeValue,
       after:afterValue,
       score:scoreValue,
@@ -2130,8 +2467,12 @@ input[type="text"]{
     for(var i=0;i<data.length;i++){
       if(String(data[i].id)===String(editingId)){
         data[i].activity = trimText(el("editActivity").value)||"未記入";
-        data[i].durationMin = trimText(el("editDurationMin").value);
-        data[i].activityCount = trimText(el("editActivityCount").value);
+        data[i].measure1Value = trimText(el("editMeasure1Value").value);
+        data[i].measure1Unit = el("editMeasure1Unit").value;
+        data[i].measure2Value = trimText(el("editMeasure2Value").value);
+        data[i].measure2Unit = el("editMeasure2Unit").value;
+        delete data[i].durationMin;
+        delete data[i].activityCount;
         data[i].before = trimText(el("editBefore").value)||"未記入";
         data[i].after = trimText(el("editAfter").value)||"未記入";
         data[i].score = editScoreValue;
@@ -2158,6 +2499,26 @@ input[type="text"]{
     clearDraft();
     resetEntry();
     window.scrollTo(0,0);
+  };
+
+  el("addUnitOptionButton").onclick = function(){
+    var value = trimText(el("newUnitOption").value);
+    if(!value) return;
+
+    var arr = readMeasureUnits();
+    for(var i=0;i<arr.length;i++){
+      if(arr[i]===value) return;
+    }
+
+    arr.push(value);
+    if(writeMeasureUnits(arr)){
+      el("newUnitOption").value = "";
+      renderUnitOptionList();
+      populateUnitSelect("measure1Unit","分");
+      populateUnitSelect("measure2Unit","回");
+      populateUnitSelect("editMeasure1Unit","分");
+      populateUnitSelect("editMeasure2Unit","回");
+    }
   };
 
   el("addActivityOptionButton").onclick = function(){
@@ -2265,6 +2626,10 @@ input[type="text"]{
 
   showToday();
   testStorage();
+  populateUnitSelect("measure1Unit","分");
+  populateUnitSelect("measure2Unit","回");
+  populateUnitSelect("editMeasure1Unit","分");
+  populateUnitSelect("editMeasure2Unit","回");
   applyTheme(readTheme());
   renderActivityChips();
   renderBeforeChips();
