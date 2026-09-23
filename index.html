@@ -16,12 +16,14 @@
 <style>
 :root{
   --bg:#f5f5f7; --card:#fff; --text:#111; --sub:#6e6e73; --line:#dddddf;
-  --accent:#111; --soft:#ececf0; --danger:#b42318; --ok:#1f7a4d;
+  --accent:#111; --accentText:#fff; --accentSoft:#e8e8eb;
+  --soft:#ececf0; --danger:#b42318; --ok:#1f7a4d;
 }
 @media (prefers-color-scheme: dark){
   :root{
     --bg:#0d0d0f; --card:#18181b; --text:#f5f5f7; --sub:#a1a1a6;
-    --line:#343438; --accent:#f5f5f7; --soft:#28282c; --danger:#ff9b91; --ok:#7bdca7;
+    --line:#343438; --accent:#f5f5f7; --accentText:#111; --accentSoft:#303035;
+    --soft:#28282c; --danger:#ff9b91; --ok:#7bdca7;
   }
 }
 *{box-sizing:border-box}
@@ -47,11 +49,11 @@ input[type="text"]{
   border:1px solid var(--line);background:var(--soft);color:var(--text);
   border-radius:999px;padding:10px 12px
 }
-.chip.active,.scoreBtn.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.chip.active,.scoreBtn.active{background:var(--accent);color:var(--accentText);border-color:var(--accent)}
 .primary,.secondary,.danger{
   width:100%;border-radius:14px;padding:14px;font-weight:700;margin-top:12px
 }
-.primary{border:0;background:var(--accent);color:var(--bg)}
+.primary{border:0;background:var(--accent);color:var(--accentText)}
 .secondary{border:1px solid var(--line);background:var(--soft);color:var(--text)}
 .danger{border:1px solid var(--line);background:transparent;color:var(--danger)}
 .hidden{display:none!important}
@@ -85,7 +87,7 @@ input[type="text"]{
 .itemActions{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
 .addRow{display:flex;gap:8px;margin-top:10px}
 .addRow input{flex:1}
-.addRow button{width:auto;margin:0;padding:0 14px;border:0;border-radius:12px;background:var(--accent);color:var(--bg);font-weight:700}
+.addRow button{width:auto;margin:0;padding:0 14px;border:0;border-radius:12px;background:var(--accent);color:var(--accentText);font-weight:700}
 .today{font-size:13px;color:var(--sub);margin-top:2px}
 .headerBar{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .iconButton{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:12px;padding:9px 12px;font-weight:700}
@@ -102,7 +104,7 @@ input[type="text"]{
   border:1px solid var(--line);background:var(--soft);color:var(--text);
   border-radius:12px;padding:10px 6px;font-weight:700
 }
-.statsTab.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.statsTab.active{background:var(--accent);color:var(--accentText);border-color:var(--accent)}
 .statsSummary{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 2px}
 .statsPeriod{
   border-top:1px solid var(--line);padding:14px 0
@@ -166,8 +168,9 @@ input[type="text"]{
   background:transparent;
 }
 .calendarDay.hasData{
-  background:var(--soft);
-  font-weight:700;
+  background:var(--accentSoft);
+  border-color:var(--accent);
+  font-weight:800;
 }
 .calendarDay.selected{
   outline:2px solid var(--accent);
@@ -231,6 +234,49 @@ input[type="text"]{
   font-weight:700;
   margin-left:3px;
   color:var(--sub);
+}
+
+.themeGrid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:10px;
+}
+.themeButton{
+  border:1px solid var(--line);
+  background:var(--card);
+  color:var(--text);
+  border-radius:13px;
+  padding:10px 7px;
+  font-size:12px;
+  font-weight:700;
+}
+.themeButton.active{
+  outline:2px solid var(--accent);
+  outline-offset:-2px;
+}
+.themeDot{
+  width:18px;height:18px;border-radius:50%;
+  display:inline-block;vertical-align:middle;margin-right:6px;
+  border:1px solid rgba(127,127,127,.3);
+}
+.backupButtons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:10px;
+}
+.backupButtons button{
+  margin:0;
+}
+.fileInputHidden{
+  display:none;
+}
+.restorePending{
+  margin-top:10px;
+  padding:11px 12px;
+  border-radius:12px;
+  background:var(--soft);
 }
 </style>
 </head>
@@ -384,7 +430,35 @@ input[type="text"]{
   <button id="backButton" class="backButton" type="button">← 戻る</button>
   <h1 style="margin-top:4px">オプション</h1>
   <p class="sub">よく使う項目と、前後の候補を編集できます。</p>
-  <p class="small">バージョン：2026.09.24-2</p>
+  <p class="small">バージョン：2026.09.24-3</p>
+
+
+  <section class="card">
+    <div class="label">THEME</div>
+    <div class="question" style="font-size:17px">テーマカラー</div>
+    <div id="themeGrid" class="themeGrid"></div>
+    <p class="small">選んだ色はボタンやカレンダーの記録日に反映されます。</p>
+  </section>
+
+  <section class="card">
+    <div class="label">BACKUP</div>
+    <div class="question" style="font-size:17px">バックアップ／復元</div>
+    <p class="small" style="font-size:13px">
+      記録、候補、並び順、テーマ設定を1つのJSONファイルに保存できます。
+      バックアップは自動で外部送信されません。
+    </p>
+    <div class="backupButtons">
+      <button id="backupButton" class="secondary" type="button">バックアップ</button>
+      <button id="restoreButton" class="secondary" type="button">復元</button>
+    </div>
+    <input id="restoreFileInput" class="fileInputHidden" type="file" accept=".json,application/json">
+    <div id="restorePending" class="restorePending hidden">
+      <div id="restoreFileName" class="small" style="margin:0 0 8px"></div>
+      <button id="confirmRestoreButton" class="danger" type="button" style="margin:0">このバックアップで復元</button>
+      <button id="cancelRestoreButton" class="secondary" type="button">キャンセル</button>
+    </div>
+    <div id="backupStatus" class="small" style="margin-top:10px"></div>
+  </section>
 
   <section class="card">
     <div class="label">FREQUENT ACTIVITIES</div>
@@ -432,6 +506,7 @@ input[type="text"]{
   var AFTER_KEY = "sukoshi_mashi_after_options_v1";
   var ACTIVITY_KEY = "sukoshi_mashi_activity_options_v1";
   var DRAFT_KEY = "sukoshi_mashi_active_draft_v1";
+  var THEME_KEY = "sukoshi_mashi_theme_v1";
 
   var defaultBeforeOptions = [
     "安心しそう","少し進みそう","理解が深まりそう",
@@ -452,6 +527,7 @@ input[type="text"]{
   var editingId = null;
   var startedAt = "";
   var storageOK = false;
+  var pendingRestoreData = null;
   var statsMode = "calendar";
   var calendarCursor = new Date();
   var selectedCalendarKey = "";
@@ -483,6 +559,72 @@ input[type="text"]{
     return two(date.getHours())+":"+two(date.getMinutes());
   }
   function trimText(s){ return String(s || "").replace(/^\s+|\s+$/g,""); }
+
+  var THEMES = {
+    graphite:{label:"黒",accent:"#111111",accentText:"#ffffff",accentSoft:"#e6e6e8"},
+    blue:{label:"青",accent:"#2563eb",accentText:"#ffffff",accentSoft:"#dbeafe"},
+    green:{label:"緑",accent:"#16803b",accentText:"#ffffff",accentSoft:"#dcfce7"},
+    purple:{label:"紫",accent:"#7c3aed",accentText:"#ffffff",accentSoft:"#ede9fe"},
+    orange:{label:"橙",accent:"#c45a09",accentText:"#ffffff",accentSoft:"#ffedd5"},
+    rose:{label:"桃",accent:"#be185d",accentText:"#ffffff",accentSoft:"#fce7f3"}
+  };
+
+  function readTheme(){
+    if(!storageOK) return "graphite";
+    try{
+      var t = localStorage.getItem(THEME_KEY) || "graphite";
+      return THEMES[t] ? t : "graphite";
+    }catch(e){ return "graphite"; }
+  }
+
+  function applyTheme(name){
+    if(!THEMES[name]) name = "graphite";
+    var t = THEMES[name];
+    var root = document.documentElement;
+
+    root.style.setProperty("--accent",t.accent);
+    root.style.setProperty("--accentText",t.accentText);
+    root.style.setProperty("--accentSoft",t.accentSoft);
+
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if(meta) meta.setAttribute("content",t.accent);
+
+    if(storageOK){
+      try{ localStorage.setItem(THEME_KEY,name); }catch(e){}
+    }
+
+    renderThemeOptions();
+  }
+
+  function renderThemeOptions(){
+    var box = el("themeGrid");
+    if(!box) return;
+    box.innerHTML = "";
+
+    var active = readTheme();
+
+    for(var key in THEMES){
+      if(!Object.prototype.hasOwnProperty.call(THEMES,key)) continue;
+
+      (function(themeKey){
+        var t = THEMES[themeKey];
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "themeButton" + (themeKey===active ? " active" : "");
+
+        var dot = document.createElement("span");
+        dot.className = "themeDot";
+        dot.style.background = t.accent;
+
+        var textNode = document.createTextNode(t.label);
+        b.appendChild(dot);
+        b.appendChild(textNode);
+
+        b.onclick = function(){ applyTheme(themeKey); };
+        box.appendChild(b);
+      })(key);
+    }
+  }
 
   function showActionNotice(text){
     var n = el("actionNotice");
@@ -1541,6 +1683,146 @@ input[type="text"]{
     window.scrollTo(0,0);
   }
 
+
+  function getBackupPayload(){
+    var draft = null;
+    try{
+      var rawDraft = localStorage.getItem(DRAFT_KEY);
+      draft = rawDraft ? JSON.parse(rawDraft) : null;
+    }catch(e){}
+
+    return {
+      app:"sukoshi-mashi",
+      backupVersion:1,
+      exportedAt:new Date().toISOString(),
+      records:readData(),
+      activityOptions:readActivityOptions(),
+      beforeOptions:readBeforeOptions(),
+      afterOptions:readAfterOptions(),
+      theme:readTheme(),
+      activeDraft:draft
+    };
+  }
+
+  function backupFilename(){
+    var d = new Date();
+    return "sukoshi_mashi_backup_"+
+      d.getFullYear()+two(d.getMonth()+1)+two(d.getDate())+"_"+
+      two(d.getHours())+two(d.getMinutes())+".json";
+  }
+
+  async function exportBackup(){
+    if(!storageOK){
+      el("backupStatus").textContent = "端末内保存が利用できないためバックアップできません。";
+      return;
+    }
+
+    var payload = getBackupPayload();
+    var jsonText = JSON.stringify(payload,null,2);
+    var filename = backupFilename();
+
+    try{
+      var file = new File([jsonText],filename,{type:"application/json"});
+
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({
+          files:[file],
+          title:"少しマシ記録 バックアップ"
+        });
+        el("backupStatus").textContent = "バックアップを書き出しました。";
+        return;
+      }
+    }catch(e){
+      if(e && e.name === "AbortError") return;
+    }
+
+    try{
+      var blob = new Blob([jsonText],{type:"application/json"});
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); },1000);
+      el("backupStatus").textContent = "バックアップファイルを保存しました。";
+    }catch(e){
+      el("backupStatus").textContent = "バックアップの書き出しに失敗しました。";
+    }
+  }
+
+  function validateBackupObject(obj){
+    return obj &&
+      obj.app === "sukoshi-mashi" &&
+      Array.isArray(obj.records) &&
+      Array.isArray(obj.activityOptions) &&
+      Array.isArray(obj.beforeOptions) &&
+      Array.isArray(obj.afterOptions);
+  }
+
+  function prepareRestore(file){
+    if(!file) return;
+
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        var obj = JSON.parse(reader.result);
+        if(!validateBackupObject(obj)) throw new Error("invalid");
+
+        pendingRestoreData = obj;
+        el("restoreFileName").textContent =
+          file.name+" / 記録 "+obj.records.length+"件";
+        el("restorePending").className = "restorePending";
+        el("backupStatus").textContent =
+          "復元すると、現在の端末内データはバックアップ内容で置き換わります。";
+      }catch(e){
+        pendingRestoreData = null;
+        el("restorePending").className = "restorePending hidden";
+        el("backupStatus").textContent = "このファイルは有効なバックアップではありません。";
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function confirmRestore(){
+    if(!pendingRestoreData || !storageOK) return;
+
+    try{
+      localStorage.setItem(DATA_KEY,JSON.stringify(pendingRestoreData.records));
+      localStorage.setItem(ACTIVITY_KEY,JSON.stringify(pendingRestoreData.activityOptions));
+      localStorage.setItem(BEFORE_KEY,JSON.stringify(pendingRestoreData.beforeOptions));
+      localStorage.setItem(AFTER_KEY,JSON.stringify(pendingRestoreData.afterOptions));
+
+      var restoredTheme = THEMES[pendingRestoreData.theme] ? pendingRestoreData.theme : "graphite";
+      localStorage.setItem(THEME_KEY,restoredTheme);
+
+      if(pendingRestoreData.activeDraft){
+        localStorage.setItem(DRAFT_KEY,JSON.stringify(pendingRestoreData.activeDraft));
+      }else{
+        localStorage.removeItem(DRAFT_KEY);
+      }
+
+      pendingRestoreData = null;
+      el("restorePending").className = "restorePending hidden";
+      el("restoreFileInput").value = "";
+
+      applyTheme(restoredTheme);
+      renderActivityChips();
+      renderBeforeChips();
+      renderAfterChips();
+      renderHistory();
+      renderStreaks();
+      renderActivityOptionList();
+      renderBeforeOptionList();
+      renderAfterOptionList();
+
+      el("backupStatus").textContent = "復元しました。";
+    }catch(e){
+      el("backupStatus").textContent = "復元に失敗しました。";
+    }
+  }
+
   function showMain(){
     el("optionsScreen").className = "hidden";
     el("historyScreen").className = "hidden";
@@ -1559,6 +1841,7 @@ input[type="text"]{
     el("historyScreen").className = "hidden";
     el("statsScreen").className = "hidden";
     el("optionsScreen").className = "";
+    renderThemeOptions();
     renderActivityOptionList();
     renderBeforeOptionList();
     renderAfterOptionList();
@@ -1728,6 +2011,24 @@ input[type="text"]{
     }
   };
 
+  el("backupButton").onclick = exportBackup;
+  el("restoreButton").onclick = function(){
+    pendingRestoreData = null;
+    el("restorePending").className = "restorePending hidden";
+    el("restoreFileInput").value = "";
+    el("restoreFileInput").click();
+  };
+  el("restoreFileInput").onchange = function(){
+    if(this.files && this.files[0]) prepareRestore(this.files[0]);
+  };
+  el("confirmRestoreButton").onclick = confirmRestore;
+  el("cancelRestoreButton").onclick = function(){
+    pendingRestoreData = null;
+    el("restorePending").className = "restorePending hidden";
+    el("restoreFileInput").value = "";
+    el("backupStatus").textContent = "";
+  };
+
   el("openStatsButton").onclick = showStats;
   el("openHistoryButton").onclick = showHistory;
   el("openOptionsButton").onclick = showOptions;
@@ -1764,6 +2065,7 @@ input[type="text"]{
 
   showToday();
   testStorage();
+  applyTheme(readTheme());
   renderActivityChips();
   renderBeforeChips();
   renderAfterChips();

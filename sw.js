@@ -1,4 +1,4 @@
-const CACHE_NAME = "sukoshi-mashi-v6";
+const CACHE_NAME = "sukoshi-mashi-v7";
 const APP_FILES = [
   "./index.html",
   "./manifest.webmanifest",
