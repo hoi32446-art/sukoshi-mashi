@@ -278,6 +278,39 @@ input[type="text"]{
   border-radius:12px;
   background:var(--soft);
 }
+
+.measureGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:12px;
+}
+.measureField label{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  color:var(--sub);
+  margin-bottom:6px;
+}
+.measureField input{
+  width:100%;
+}
+.historyMeasure{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:6px;
+}
+.measureBadge{
+  display:inline-block;
+  background:var(--accentSoft);
+  color:var(--text);
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:4px 8px;
+  font-size:12px;
+  font-weight:700;
+}
 </style>
 </head>
 <body>
@@ -319,6 +352,17 @@ input[type="text"]{
     <div id="activityChips" class="chips"></div>
     <input id="activity" type="text" maxlength="60" placeholder="選ぶか、自由に入力" style="margin-top:10px">
 
+    <div class="measureGrid">
+      <div class="measureField">
+        <label for="durationMin">時間（分・任意）</label>
+        <input id="durationMin" type="number" inputmode="numeric" min="0" max="99999" step="1" placeholder="例：30">
+      </div>
+      <div class="measureField">
+        <label for="activityCount">回数（任意）</label>
+        <input id="activityCount" type="number" inputmode="numeric" min="0" max="999999" step="1" placeholder="例：20">
+      </div>
+    </div>
+
     <div class="question" style="margin-top:18px">これをやったら、何が少しマシになりそう？</div>
     <div id="beforeChips" class="chips"></div>
     <input id="beforeCustom" type="text" maxlength="80" placeholder="必要なら一言だけ" style="margin-top:10px">
@@ -352,31 +396,6 @@ input[type="text"]{
     <button id="cancelButton" class="secondary" type="button">今回をキャンセル</button>
   </section>
 
-  <section id="editSection" class="card hidden">
-    <div class="label">EDIT RECORD</div>
-    <div class="question">記録を編集</div>
-    <div id="editDate" class="editMeta"></div>
-
-    <div class="label">実施項目</div>
-    <input id="editActivity" type="text" maxlength="60">
-
-    <div class="label" style="margin-top:14px">前：何が少しマシになりそう？</div>
-    <input id="editBefore" type="text" maxlength="80">
-
-    <div class="label" style="margin-top:14px">後：実際、何が少しマシになった？</div>
-    <input id="editAfter" type="text" maxlength="80">
-
-    <div class="question" style="font-size:16px;margin-top:18px">どれくらいマシだった？</div>
-    <div class="scoreRow" id="editScoreRow">
-      <button class="scoreBtn editScoreBtn" type="button" data-edit-score="0">0<br><span class="small">なし</span></button>
-      <button class="scoreBtn editScoreBtn" type="button" data-edit-score="1">1<br><span class="small">少し</span></button>
-      <button class="scoreBtn editScoreBtn" type="button" data-edit-score="2">2<br><span class="small">まあまあ</span></button>
-      <button class="scoreBtn editScoreBtn" type="button" data-edit-score="3">3<br><span class="small">かなり</span></button>
-    </div>
-
-    <button id="saveEditButton" class="primary" type="button">変更を保存</button>
-    <button id="cancelEditButton" class="secondary" type="button">編集をキャンセル</button>
-  </section>
 
 
   <section class="card">
@@ -421,6 +440,44 @@ input[type="text"]{
     <span id="count" class="badge">0件</span>
   </div>
 
+
+  <section id="editSection" class="card hidden">
+    <div class="label">EDIT RECORD</div>
+    <div class="question">記録を編集</div>
+    <div id="editDate" class="editMeta"></div>
+
+    <div class="label">実施項目</div>
+    <input id="editActivity" type="text" maxlength="60">
+
+    <div class="measureGrid">
+      <div class="measureField">
+        <label for="editDurationMin">時間（分）</label>
+        <input id="editDurationMin" type="number" inputmode="numeric" min="0" max="99999" step="1">
+      </div>
+      <div class="measureField">
+        <label for="editActivityCount">回数</label>
+        <input id="editActivityCount" type="number" inputmode="numeric" min="0" max="999999" step="1">
+      </div>
+    </div>
+
+    <div class="label" style="margin-top:14px">前：何が少しマシになりそう？</div>
+    <input id="editBefore" type="text" maxlength="80">
+
+    <div class="label" style="margin-top:14px">後：実際、何が少しマシになった？</div>
+    <input id="editAfter" type="text" maxlength="80">
+
+    <div class="question" style="font-size:16px;margin-top:18px">どれくらいマシだった？</div>
+    <div class="scoreRow" id="editScoreRow">
+      <button class="scoreBtn editScoreBtn" type="button" data-edit-score="0">0<br><span class="small">なし</span></button>
+      <button class="scoreBtn editScoreBtn" type="button" data-edit-score="1">1<br><span class="small">少し</span></button>
+      <button class="scoreBtn editScoreBtn" type="button" data-edit-score="2">2<br><span class="small">まあまあ</span></button>
+      <button class="scoreBtn editScoreBtn" type="button" data-edit-score="3">3<br><span class="small">かなり</span></button>
+    </div>
+
+    <button id="saveEditButton" class="primary" type="button">変更を保存</button>
+    <button id="cancelEditButton" class="secondary" type="button">編集をキャンセル</button>
+  </section>
+
   <section class="card">
     <div id="history"></div>
   </section>
@@ -430,7 +487,7 @@ input[type="text"]{
   <button id="backButton" class="backButton" type="button">← 戻る</button>
   <h1 style="margin-top:4px">オプション</h1>
   <p class="sub">よく使う項目と、前後の候補を編集できます。</p>
-  <p class="small">バージョン：2026.09.24-4</p>
+  <p class="small">バージョン：2026.09.24-5</p>
 
 
   <section class="card">
@@ -792,6 +849,8 @@ input[type="text"]{
     try{
       var draft = {
         activity: trimText(el("activity").value),
+        durationMin: trimText(el("durationMin").value),
+        activityCount: trimText(el("activityCount").value),
         before: beforeValue || trimText(el("beforeCustom").value) || "未記入",
         startedAt: startedAt || new Date().toISOString()
       };
@@ -813,6 +872,8 @@ input[type="text"]{
       if(!d || !d.activity) return;
 
       el("activity").value = String(d.activity).slice(0,60);
+      el("durationMin").value = d.durationMin != null ? String(d.durationMin).slice(0,8) : "";
+      el("activityCount").value = d.activityCount != null ? String(d.activityCount).slice(0,8) : "";
       beforeValue = String(d.before || "未記入").slice(0,80);
       startedAt = d.startedAt || new Date().toISOString();
 
@@ -1051,6 +1112,8 @@ input[type="text"]{
     scoreValue = 0;
     startedAt = "";
     el("activity").value = "";
+    el("durationMin").value = "";
+    el("activityCount").value = "";
     el("beforeCustom").value = "";
     el("afterCustom").value = "";
     clearSelectedChips("activityChips");
@@ -1091,12 +1154,20 @@ input[type="text"]{
 
     editingId = String(found.id);
     el("editActivity").value = found.activity || "";
+    el("editDurationMin").value =
+      found.durationMin !== undefined && found.durationMin !== null ? found.durationMin : "";
+    el("editActivityCount").value =
+      found.activityCount !== undefined && found.activityCount !== null ? found.activityCount : "";
     el("editBefore").value = found.before || "";
     el("editAfter").value = found.after || "";
     setEditScore(Number(found.score)||0);
 
     var dt = found.savedAt ? new Date(found.savedAt) : null;
     el("editDate").textContent = (dt && !isNaN(dt.getTime())) ? formatDateTime(dt) : "";
+    el("mainScreen").className = "hidden";
+    el("optionsScreen").className = "hidden";
+    el("statsScreen").className = "hidden";
+    el("historyScreen").className = "";
     el("editSection").className = "card";
 
     try{ el("editSection").scrollIntoView({behavior:"smooth",block:"start"}); }
@@ -1258,6 +1329,28 @@ input[type="text"]{
         top.appendChild(title);
         top.appendChild(time);
         item.appendChild(top);
+
+        if((x.durationMin !== undefined && trimText(x.durationMin) !== "") ||
+           (x.activityCount !== undefined && trimText(x.activityCount) !== "")){
+          var measures = document.createElement("div");
+          measures.className = "historyMeasure";
+
+          if(x.durationMin !== undefined && trimText(x.durationMin) !== ""){
+            var durationBadge = document.createElement("span");
+            durationBadge.className = "measureBadge";
+            durationBadge.textContent = trimText(x.durationMin)+"分";
+            measures.appendChild(durationBadge);
+          }
+
+          if(x.activityCount !== undefined && trimText(x.activityCount) !== ""){
+            var countBadge = document.createElement("span");
+            countBadge.className = "measureBadge";
+            countBadge.textContent = trimText(x.activityCount)+"回";
+            measures.appendChild(countBadge);
+          }
+
+          item.appendChild(measures);
+        }
 
         var line1 = document.createElement("div");
         line1.className = "small";
@@ -2008,6 +2101,8 @@ input[type="text"]{
     var entry = {
       id:String(now.getTime()),
       activity:trimText(el("activity").value)||"未記入",
+      durationMin:trimText(el("durationMin").value),
+      activityCount:trimText(el("activityCount").value),
       before:beforeValue,
       after:afterValue,
       score:scoreValue,
@@ -2035,6 +2130,8 @@ input[type="text"]{
     for(var i=0;i<data.length;i++){
       if(String(data[i].id)===String(editingId)){
         data[i].activity = trimText(el("editActivity").value)||"未記入";
+        data[i].durationMin = trimText(el("editDurationMin").value);
+        data[i].activityCount = trimText(el("editActivityCount").value);
         data[i].before = trimText(el("editBefore").value)||"未記入";
         data[i].after = trimText(el("editAfter").value)||"未記入";
         data[i].score = editScoreValue;
@@ -2046,13 +2143,17 @@ input[type="text"]{
     if(updated && writeData(data)){
       closeEdit();
       renderHistory();
-        showActionNotice("変更を保存しました");
+      renderStreaks();
+      showHistory();
     }else{
       showActionNotice("変更を保存できませんでした");
     }
   };
 
-  el("cancelEditButton").onclick = closeEdit;
+  el("cancelEditButton").onclick = function(){
+    closeEdit();
+    showHistory();
+  };
   el("cancelButton").onclick = function(){
     clearDraft();
     resetEntry();
