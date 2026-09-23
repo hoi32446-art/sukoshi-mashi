@@ -202,6 +202,36 @@ input[type="text"]{
   font-size:13px;
   padding:12px 0;
 }
+
+.streakCard{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:12px 0;
+}
+.streakBox{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:13px 14px;
+}
+.streakLabel{
+  font-size:12px;
+  color:var(--sub);
+  font-weight:700;
+  margin-bottom:4px;
+}
+.streakValue{
+  font-size:24px;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+.streakValue span{
+  font-size:13px;
+  font-weight:700;
+  margin-left:3px;
+  color:var(--sub);
+}
 </style>
 </head>
 <body>
@@ -223,6 +253,17 @@ input[type="text"]{
   <p class="sub">前に予測して、後に「実際どうだったか」を残すだけ。</p>
   <div id="storageStatus" class="status">端末内保存を確認しています…</div>
   <div id="actionNotice" class="status good hidden noticeFixed"></div>
+
+  <div class="streakCard">
+    <div class="streakBox">
+      <div class="streakLabel">現在の連続記録</div>
+      <div id="currentStreak" class="streakValue">0<span>日</span></div>
+    </div>
+    <div class="streakBox">
+      <div class="streakLabel">最長連続記録</div>
+      <div id="longestStreak" class="streakValue">0<span>日</span></div>
+    </div>
+  </div>
 
 
   <section class="card">
@@ -343,6 +384,7 @@ input[type="text"]{
   <button id="backButton" class="backButton" type="button">← 戻る</button>
   <h1 style="margin-top:4px">オプション</h1>
   <p class="sub">よく使う項目と、前後の候補を編集できます。</p>
+  <p class="small">バージョン：2026.09.24-2</p>
 
   <section class="card">
     <div class="label">FREQUENT ACTIVITIES</div>
@@ -838,6 +880,83 @@ input[type="text"]{
   }
 
 
+
+
+  function localDaySerial(date){
+    return Math.floor(Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    ) / 86400000);
+  }
+
+  function getRecordedDaySerials(){
+    var data = readData();
+    var seen = {};
+    var days = [];
+
+    for(var i=0;i<data.length;i++){
+      var x = data[i];
+      if(!x.savedAt) continue;
+
+      var d = new Date(x.savedAt);
+      if(isNaN(d.getTime())) continue;
+
+      var serial = localDaySerial(d);
+      if(!seen[serial]){
+        seen[serial] = true;
+        days.push(serial);
+      }
+    }
+
+    days.sort(function(a,b){ return a-b; });
+    return days;
+  }
+
+  function calculateStreaks(){
+    var days = getRecordedDaySerials();
+
+    if(days.length===0){
+      return {current:0,longest:0};
+    }
+
+    var longest = 1;
+    var run = 1;
+
+    for(var i=1;i<days.length;i++){
+      if(days[i]===days[i-1]+1){
+        run += 1;
+      }else{
+        run = 1;
+      }
+      if(run>longest) longest = run;
+    }
+
+    var today = localDaySerial(new Date());
+    var latest = days[days.length-1];
+    var current = 0;
+
+    // 今日または昨日が最新記録なら、連続は継続中として表示する。
+    if(latest===today || latest===today-1){
+      current = 1;
+
+      for(var j=days.length-1;j>0;j--){
+        if(days[j-1]===days[j]-1){
+          current += 1;
+        }else{
+          break;
+        }
+      }
+    }
+
+    return {current:current,longest:longest};
+  }
+
+  function renderStreaks(){
+    var s = calculateStreaks();
+    el("currentStreak").innerHTML = s.current+'<span>日</span>';
+    el("longestStreak").innerHTML = s.longest+'<span>日</span>';
+  }
 
   function renderHistory(){
     var data = readData();
@@ -1430,6 +1549,7 @@ input[type="text"]{
     renderActivityChips();
     renderBeforeChips();
     renderAfterChips();
+    renderStreaks();
     window.scrollTo(0,0);
   }
 
@@ -1648,6 +1768,7 @@ input[type="text"]{
   renderBeforeChips();
   renderAfterChips();
   renderHistory();
+  renderStreaks();
   restoreDraft();
 })();
 </script>
@@ -1655,7 +1776,18 @@ input[type="text"]{
 <script>
 if ("serviceWorker" in navigator && location.protocol === "https:") {
   window.addEventListener("load", function () {
-    navigator.serviceWorker.register("./sw.js").catch(function () {});
+    navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" })
+      .then(function (registration) {
+        registration.update().catch(function () {});
+      })
+      .catch(function () {});
+
+    var reloadingForUpdate = false;
+    navigator.serviceWorker.addEventListener("controllerchange", function () {
+      if (reloadingForUpdate) return;
+      reloadingForUpdate = true;
+      window.location.reload();
+    });
   });
 }
 </script>
