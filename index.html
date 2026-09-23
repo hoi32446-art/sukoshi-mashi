@@ -1,0 +1,1399 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#f5f5f7">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="少しマシ">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<title>少しマシ記録</title>
+<style>
+:root{
+  --bg:#f5f5f7; --card:#fff; --text:#111; --sub:#6e6e73; --line:#dddddf;
+  --accent:#111; --soft:#ececf0; --danger:#b42318; --ok:#1f7a4d;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0d0d0f; --card:#18181b; --text:#f5f5f7; --sub:#a1a1a6;
+    --line:#343438; --accent:#f5f5f7; --soft:#28282c; --danger:#ff9b91; --ok:#7bdca7;
+  }
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  padding:calc(18px + env(safe-area-inset-top)) 16px calc(30px + env(safe-area-inset-bottom));
+}
+main{max-width:560px;margin:0 auto}
+h1{font-size:28px;margin:6px 0 4px;letter-spacing:-.03em}
+p{line-height:1.55}
+.sub{color:var(--sub);font-size:14px;margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:17px;margin:12px 0}
+.label{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px}
+.question{font-size:19px;font-weight:700;line-height:1.45;margin-bottom:12px}
+input,button{font:inherit}
+input[type="text"]{
+  width:100%;border:1px solid var(--line);border-radius:13px;padding:13px;
+  background:var(--bg);color:var(--text);-webkit-appearance:none;appearance:none;
+}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip,.scoreBtn{
+  border:1px solid var(--line);background:var(--soft);color:var(--text);
+  border-radius:999px;padding:10px 12px
+}
+.chip.active,.scoreBtn.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.primary,.secondary,.danger{
+  width:100%;border-radius:14px;padding:14px;font-weight:700;margin-top:12px
+}
+.primary{border:0;background:var(--accent);color:var(--bg)}
+.secondary{border:1px solid var(--line);background:var(--soft);color:var(--text)}
+.danger{border:1px solid var(--line);background:transparent;color:var(--danger)}
+.hidden{display:none!important}
+.status{padding:11px 12px;border-radius:12px;background:var(--soft);font-size:13px;margin-bottom:12px}
+.status.bad{color:var(--danger)}
+.status.good{color:var(--ok)}
+.scoreRow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.scoreBtn{border-radius:13px;padding:12px 4px;font-weight:700}
+.historyDateGroup{margin-top:16px}
+.historyDateHeader{
+  font-size:15px;font-weight:800;letter-spacing:-.01em;
+  padding:8px 10px;border-radius:12px;background:var(--soft);
+  margin-bottom:2px;
+}
+.historyItem{border-top:1px solid var(--line);padding:12px 2px}
+.historyItem:first-child{border-top:0}
+.historyTitle{font-weight:700}
+.small{font-size:12px;color:var(--sub);margin-top:4px;line-height:1.5}
+.badge{display:inline-block;background:var(--soft);border-radius:999px;padding:4px 8px;font-size:12px;font-weight:700}
+.toprow{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.optionRow{display:flex;gap:8px;align-items:center;border-top:1px solid var(--line);padding:10px 0}
+.optionRow:first-child{border-top:0}
+.optionText{flex:1;font-size:14px}
+.miniDanger,.miniBtn,.miniConfirm,.miniMove{
+  border:1px solid var(--line);background:transparent;border-radius:10px;padding:8px 10px;font-size:12px
+}
+.miniDanger{color:var(--danger)}
+.miniBtn{color:var(--text);background:var(--soft)}
+.miniMove{color:var(--text);background:var(--card);font-weight:700;min-width:34px}
+.miniConfirm{color:#fff;background:var(--danger);border-color:var(--danger);font-weight:700}
+.itemActions{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+.addRow{display:flex;gap:8px;margin-top:10px}
+.addRow input{flex:1}
+.addRow button{width:auto;margin:0;padding:0 14px;border:0;border-radius:12px;background:var(--accent);color:var(--bg);font-weight:700}
+.today{font-size:13px;color:var(--sub);margin-top:2px}
+.headerBar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.iconButton{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:12px;padding:9px 12px;font-weight:700}
+.backButton{border:0;background:transparent;color:var(--text);padding:8px 0;font-weight:700;font-size:15px}
+.editMeta{font-size:12px;color:var(--sub);margin-bottom:14px}
+.noticeFixed{margin-top:10px}
+.optionEditInput{
+  flex:1; min-width:0; border:1px solid var(--line)!important; border-radius:10px!important;
+  padding:9px 10px!important; background:var(--bg)!important;
+}
+
+.statsTabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.statsTab{
+  border:1px solid var(--line);background:var(--soft);color:var(--text);
+  border-radius:12px;padding:10px 6px;font-weight:700
+}
+.statsTab.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.statsSummary{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 2px}
+.statsPeriod{
+  border-top:1px solid var(--line);padding:14px 0
+}
+.statsPeriod:first-child{border-top:0}
+.statsPeriodHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px}
+.statsPeriodTitle{font-weight:800}
+.statsPeriodTotal{font-size:12px;color:var(--sub);white-space:nowrap}
+.statLine{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;margin:8px 0}
+.statName{font-size:13px;overflow-wrap:anywhere}
+.statCount{font-size:13px;font-weight:800;white-space:nowrap}
+.statBarTrack{height:6px;background:var(--soft);border-radius:999px;overflow:hidden;margin-top:4px}
+.statBarFill{height:100%;background:var(--accent);border-radius:999px;min-width:2px}
+.statsNote{font-size:12px;color:var(--sub);line-height:1.55;margin-top:10px}
+</style>
+</head>
+<body>
+<main>
+
+<div id="mainScreen">
+  <div class="headerBar">
+    <div>
+      <h1>少しマシ記録</h1>
+      <div id="todayText" class="today"></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+      <button id="openStatsButton" class="iconButton" type="button">集計</button>
+      <button id="openHistoryButton" class="iconButton" type="button">ヒストリー</button>
+      <button id="openOptionsButton" class="iconButton" type="button">オプション</button>
+    </div>
+  </div>
+
+  <p class="sub">前に予測して、後に「実際どうだったか」を残すだけ。</p>
+  <div id="storageStatus" class="status">端末内保存を確認しています…</div>
+  <div id="actionNotice" class="status good hidden noticeFixed"></div>
+
+  <section class="card">
+    <div class="label">STEP 1</div>
+
+    <div class="question">何に取り組む？</div>
+    <div id="activityChips" class="chips"></div>
+    <input id="activity" type="text" maxlength="60" placeholder="選ぶか、自由に入力" style="margin-top:10px">
+
+    <div class="question" style="margin-top:18px">これをやったら、何が少しマシになりそう？</div>
+    <div id="beforeChips" class="chips"></div>
+    <input id="beforeCustom" type="text" maxlength="80" placeholder="必要なら一言だけ" style="margin-top:10px">
+
+    <button id="startButton" class="primary" type="button">取り組む</button>
+    <div id="startedNotice" class="status hidden" style="margin-top:12px">
+      開始しました。終わったら下のSTEP 2を入力してください。
+    </div>
+  </section>
+
+  <section id="afterSection" class="card hidden">
+    <div class="label">STEP 2</div>
+    <div class="question">実際、何が少しマシになった？</div>
+
+    <div id="afterChips" class="chips"></div>
+    <input id="afterCustom" type="text" maxlength="80" placeholder="必要なら一言だけ" style="margin-top:10px">
+
+    <div class="question" style="font-size:16px;margin-top:18px">どれくらいマシだった？</div>
+    <div class="scoreRow">
+      <button class="scoreBtn" type="button" data-score="0">0<br><span class="small">なし</span></button>
+      <button class="scoreBtn" type="button" data-score="1">1<br><span class="small">少し</span></button>
+      <button class="scoreBtn" type="button" data-score="2">2<br><span class="small">まあまあ</span></button>
+      <button class="scoreBtn" type="button" data-score="3">3<br><span class="small">かなり</span></button>
+    </div>
+
+    <div class="status" style="margin-top:16px">
+      5〜10秒だけ、そのプラスに注意して、<strong>「これ、やったから得られたんだな」</strong>と確認。
+    </div>
+
+    <button id="saveButton" class="primary" type="button">記録を保存</button>
+    <button id="cancelButton" class="secondary" type="button">今回をキャンセル</button>
+  </section>
+
+  <section id="editSection" class="card hidden">
+    <div class="label">EDIT RECORD</div>
+    <div class="question">記録を編集</div>
+    <div id="editDate" class="editMeta"></div>
+
+    <div class="label">実施項目</div>
+    <input id="editActivity" type="text" maxlength="60">
+
+    <div class="label" style="margin-top:14px">前：何が少しマシになりそう？</div>
+    <input id="editBefore" type="text" maxlength="80">
+
+    <div class="label" style="margin-top:14px">後：実際、何が少しマシになった？</div>
+    <input id="editAfter" type="text" maxlength="80">
+
+    <div class="question" style="font-size:16px;margin-top:18px">どれくらいマシだった？</div>
+    <div class="scoreRow" id="editScoreRow">
+      <button class="scoreBtn editScoreBtn" type="button" data-edit-score="0">0<br><span class="small">なし</span></button>
+      <button class="scoreBtn editScoreBtn" type="button" data-edit-score="1">1<br><span class="small">少し</span></button>
+      <button class="scoreBtn editScoreBtn" type="button" data-edit-score="2">2<br><span class="small">まあまあ</span></button>
+      <button class="scoreBtn editScoreBtn" type="button" data-edit-score="3">3<br><span class="small">かなり</span></button>
+    </div>
+
+    <button id="saveEditButton" class="primary" type="button">変更を保存</button>
+    <button id="cancelEditButton" class="secondary" type="button">編集をキャンセル</button>
+  </section>
+
+
+  <section class="card">
+    <div class="label">SECURITY</div>
+    <p class="small" style="font-size:13px">
+      外部通信・広告・アクセス解析・位置情報・カメラ・外部ライブラリは使っていません。
+      記録と設定は、このアプリを開いている端末のブラウザ内ストレージだけに保存します。外部サーバーへ記録内容を送信する処理は入れていません。
+      個人名・職場の機密・詳しい健康情報などは入力しないでください。
+    </p>
+    <button id="deleteButton" class="danger" type="button">端末内の記録をすべて削除</button>
+  </section>
+</div>
+
+
+
+<div id="statsScreen" class="hidden">
+  <button id="statsBackButton" class="backButton" type="button">← 戻る</button>
+  <h1 style="margin-top:4px">集計</h1>
+  <p class="sub">「実際、何が少しマシになった？」の内容別に、件数の積み上がりを確認できます。</p>
+
+  <section class="card">
+    <div class="statsTabs">
+      <button id="statsDailyTab" class="statsTab active" type="button">日別</button>
+      <button id="statsMonthlyTab" class="statsTab" type="button">月別</button>
+      <button id="statsAllTab" class="statsTab" type="button">全期間</button>
+    </div>
+
+    <div id="statsSummary" class="statsSummary"></div>
+    <div id="statsContent"></div>
+    <div id="statsNote" class="statsNote"></div>
+  </section>
+</div>
+
+<div id="historyScreen" class="hidden">
+  <button id="historyBackButton" class="backButton" type="button">← 戻る</button>
+  <div class="toprow" style="margin-top:4px">
+    <div>
+      <h1 style="margin:0">ヒストリー</h1>
+      <p class="sub" style="margin-top:6px">これまでの記録を日付ごとに確認できます。</p>
+    </div>
+    <span id="count" class="badge">0件</span>
+  </div>
+
+  <section class="card">
+    <div id="history"></div>
+  </section>
+</div>
+
+<div id="optionsScreen" class="hidden">
+  <button id="backButton" class="backButton" type="button">← 戻る</button>
+  <h1 style="margin-top:4px">オプション</h1>
+  <p class="sub">よく使う項目と、前後の候補を編集できます。</p>
+
+  <section class="card">
+    <div class="label">FREQUENT ACTIVITIES</div>
+    <div class="question" style="font-size:17px">よく取り組むもの</div>
+    <div id="activityOptionList"></div>
+
+    <div class="addRow">
+      <input id="newActivityOption" type="text" maxlength="40" placeholder="例：英語、筋トレ">
+      <button id="addActivityOptionButton" type="button">追加</button>
+    </div>
+    <p class="small">登録した項目がメイン画面に表示されます。↑↓で表示順を変更できます。</p>
+  </section>
+
+  <section class="card">
+    <div class="label">BEFORE OPTIONS</div>
+    <div class="question" style="font-size:17px">「何が少しマシになりそう？」の候補</div>
+    <div id="beforeOptionList"></div>
+
+    <div class="addRow">
+      <input id="newBeforeOption" type="text" maxlength="40" placeholder="候補を追加">
+      <button id="addBeforeOptionButton" type="button">追加</button>
+    </div>
+    <p class="small">追加・編集・削除・並び替えはメイン画面に反映されます。</p>
+  </section>
+
+  <section class="card">
+    <div class="label">AFTER OPTIONS</div>
+    <div class="question" style="font-size:17px">「実際、何が少しマシになった？」の候補</div>
+    <div id="afterOptionList"></div>
+
+    <div class="addRow">
+      <input id="newAfterOption" type="text" maxlength="40" placeholder="候補を追加">
+      <button id="addAfterOptionButton" type="button">追加</button>
+    </div>
+    <p class="small">こちらも追加・編集・削除・並び替えができ、STEP 2に反映されます。</p>
+  </section>
+</div>
+
+</main>
+
+<script>
+(function(){
+  var DATA_KEY = "sukoshi_mashi_iphone_v3";
+  var BEFORE_KEY = "sukoshi_mashi_before_options_v1";
+  var AFTER_KEY = "sukoshi_mashi_after_options_v1";
+  var ACTIVITY_KEY = "sukoshi_mashi_activity_options_v1";
+  var DRAFT_KEY = "sukoshi_mashi_active_draft_v1";
+
+  var defaultBeforeOptions = [
+    "安心しそう","少し進みそう","理解が深まりそう",
+    "スッキリしそう","達成感がありそう","気が軽くなりそう"
+  ];
+
+  var defaultAfterOptions = [
+    "少し安心","少し進んだ","少し理解できた","少しスッキリ",
+    "少し達成感","少し気が軽い","少し興味が出た","特になし"
+  ];
+
+  var defaultActivityOptions = ["英語","勉強","筋トレ","仕事","読書","散歩"];
+
+  var beforeValue = "";
+  var afterValue = "";
+  var scoreValue = 0;
+  var editScoreValue = 0;
+  var editingId = null;
+  var startedAt = "";
+  var storageOK = false;
+  var statsMode = "daily";
+
+  function el(id){ return document.getElementById(id); }
+  function weekdayJP(date){ return ["日","月","火","水","木","金","土"][date.getDay()]; }
+  function two(n){ return n < 10 ? "0"+n : String(n); }
+  function formatDateTime(date){
+    return date.getFullYear()+"/"+(date.getMonth()+1)+"/"+date.getDate()+
+      "（"+weekdayJP(date)+"） "+two(date.getHours())+":"+two(date.getMinutes());
+  }
+
+  function formatHistoryDate(date){
+    var now = new Date();
+    var todayKey = now.getFullYear()+"-"+two(now.getMonth()+1)+"-"+two(now.getDate());
+
+    var yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate()-1);
+    var yesterdayKey = yesterday.getFullYear()+"-"+two(yesterday.getMonth()+1)+"-"+two(yesterday.getDate());
+
+    var key = date.getFullYear()+"-"+two(date.getMonth()+1)+"-"+two(date.getDate());
+    var base = date.getFullYear()+"/"+(date.getMonth()+1)+"/"+date.getDate()+"（"+weekdayJP(date)+"）";
+
+    if(key === todayKey) return "今日　"+base;
+    if(key === yesterdayKey) return "昨日　"+base;
+    return base;
+  }
+
+  function formatHistoryTime(date){
+    return two(date.getHours())+":"+two(date.getMinutes());
+  }
+  function trimText(s){ return String(s || "").replace(/^\s+|\s+$/g,""); }
+
+  function showActionNotice(text){
+    var n = el("actionNotice");
+    n.textContent = text;
+    n.className = "status good noticeFixed";
+    setTimeout(function(){ n.className = "status good hidden noticeFixed"; },1800);
+  }
+
+  function showToday(){
+    var d = new Date();
+    el("todayText").textContent =
+      d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate()+"（"+weekdayJP(d)+"）";
+  }
+
+  function testStorage(){
+    try{
+      localStorage.setItem("__mashi_test__","1");
+      localStorage.removeItem("__mashi_test__");
+      storageOK = true;
+      el("storageStatus").textContent = "端末内保存：利用できます";
+      el("storageStatus").className = "status";
+    }catch(e){
+      storageOK = false;
+      el("storageStatus").textContent = "この開き方では端末内保存が使えません。Safariで開いてください。";
+      el("storageStatus").className = "status bad";
+    }
+  }
+
+  function readArray(key, defaults){
+    if(!storageOK) return defaults.slice();
+    try{
+      var raw = localStorage.getItem(key);
+      if(!raw) return defaults.slice();
+      var arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : defaults.slice();
+    }catch(e){ return defaults.slice(); }
+  }
+
+  function writeArray(key, arr){
+    if(!storageOK) return false;
+    try{
+      localStorage.setItem(key, JSON.stringify(arr));
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function readData(){
+    if(!storageOK) return [];
+    try{
+      var raw = localStorage.getItem(DATA_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    }catch(e){ return []; }
+  }
+
+  function writeData(arr){
+    if(!storageOK) return false;
+    try{
+      localStorage.setItem(DATA_KEY, JSON.stringify(arr));
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function saveDraft(){
+    if(!storageOK) return;
+    try{
+      var draft = {
+        activity: trimText(el("activity").value),
+        before: beforeValue || trimText(el("beforeCustom").value) || "未記入",
+        startedAt: startedAt || new Date().toISOString()
+      };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    }catch(e){}
+  }
+
+  function clearDraft(){
+    if(!storageOK) return;
+    try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
+  }
+
+  function restoreDraft(){
+    if(!storageOK) return;
+    try{
+      var raw = localStorage.getItem(DRAFT_KEY);
+      if(!raw) return;
+      var d = JSON.parse(raw);
+      if(!d || !d.activity) return;
+
+      el("activity").value = String(d.activity).slice(0,60);
+      beforeValue = String(d.before || "未記入").slice(0,80);
+      startedAt = d.startedAt || new Date().toISOString();
+
+      el("afterSection").className = "card";
+      el("startedNotice").className = "status";
+      el("startedNotice").textContent = "前回の取り組みを再開しています。終わったらSTEP 2を入力してください。";
+      el("startButton").disabled = true;
+      el("startButton").textContent = "取り組み中";
+    }catch(e){}
+  }
+
+  function readBeforeOptions(){ return readArray(BEFORE_KEY, defaultBeforeOptions); }
+  function writeBeforeOptions(arr){ return writeArray(BEFORE_KEY, arr); }
+  function readAfterOptions(){ return readArray(AFTER_KEY, defaultAfterOptions); }
+  function writeAfterOptions(arr){ return writeArray(AFTER_KEY, arr); }
+  function readActivityOptions(){ return readArray(ACTIVITY_KEY, defaultActivityOptions); }
+  function writeActivityOptions(arr){ return writeArray(ACTIVITY_KEY, arr); }
+
+  function clearSelectedChips(containerId){
+    var kids = el(containerId).getElementsByTagName("button");
+    for(var i=0;i<kids.length;i++) kids[i].className = "chip";
+  }
+
+  function renderActivityChips(){
+    var box = el("activityChips");
+    box.innerHTML = "";
+    var values = readActivityOptions();
+
+    for(var i=0;i<values.length;i++){
+      (function(value){
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip";
+        b.textContent = value;
+        b.onclick = function(){
+          clearSelectedChips("activityChips");
+          b.className = "chip active";
+          el("activity").value = value;
+        };
+        box.appendChild(b);
+      })(values[i]);
+    }
+  }
+
+  function renderBeforeChips(){
+    var box = el("beforeChips");
+    box.innerHTML = "";
+    var values = readBeforeOptions();
+
+    for(var i=0;i<values.length;i++){
+      (function(value){
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip";
+        b.textContent = value;
+        b.onclick = function(){
+          clearSelectedChips("beforeChips");
+          b.className = "chip active";
+          beforeValue = value;
+        };
+        box.appendChild(b);
+      })(values[i]);
+    }
+  }
+
+  function renderAfterChips(){
+    var box = el("afterChips");
+    box.innerHTML = "";
+    var values = readAfterOptions();
+
+    for(var i=0;i<values.length;i++){
+      (function(value){
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip";
+        b.textContent = value;
+        b.onclick = function(){
+          clearSelectedChips("afterChips");
+          b.className = "chip active";
+          afterValue = value;
+        };
+        box.appendChild(b);
+      })(values[i]);
+    }
+  }
+
+  function renderEditableList(boxId, values, onSave, rerenderAll){
+    var box = el(boxId);
+    box.innerHTML = "";
+
+    if(values.length === 0){
+      var empty = document.createElement("div");
+      empty.className = "small";
+      empty.textContent = "登録はありません。下から追加できます。";
+      box.appendChild(empty);
+      return;
+    }
+
+    function moveItem(fromIndex, toIndex){
+      if(toIndex < 0 || toIndex >= values.length || fromIndex === toIndex) return;
+      var latest = values.slice();
+      var moved = latest.splice(fromIndex,1)[0];
+      latest.splice(toIndex,0,moved);
+      if(onSave(latest)) rerenderAll();
+    }
+
+    for(var i=0;i<values.length;i++){
+      (function(index,value){
+        var row = document.createElement("div");
+        row.className = "optionRow";
+
+        var text = document.createElement("div");
+        text.className = "optionText";
+        text.textContent = value;
+
+        var up = document.createElement("button");
+        up.type = "button";
+        up.className = "miniMove";
+        up.textContent = "↑";
+        up.disabled = (index === 0);
+        up.style.opacity = index === 0 ? "0.35" : "1";
+        up.onclick = function(){ moveItem(index,index-1); };
+
+        var down = document.createElement("button");
+        down.type = "button";
+        down.className = "miniMove";
+        down.textContent = "↓";
+        down.disabled = (index === values.length-1);
+        down.style.opacity = index === values.length-1 ? "0.35" : "1";
+        down.onclick = function(){ moveItem(index,index+1); };
+
+        var edit = document.createElement("button");
+        edit.type = "button";
+        edit.className = "miniBtn";
+        edit.textContent = "編集";
+
+        var del = document.createElement("button");
+        del.type = "button";
+        del.className = "miniDanger";
+        del.textContent = "削除";
+
+        edit.onclick = function(){
+          row.innerHTML = "";
+
+          var input = document.createElement("input");
+          input.type = "text";
+          input.maxLength = 40;
+          input.value = value;
+          input.className = "optionEditInput";
+
+          var save = document.createElement("button");
+          save.type = "button";
+          save.className = "miniBtn";
+          save.textContent = "保存";
+
+          var cancel = document.createElement("button");
+          cancel.type = "button";
+          cancel.className = "miniBtn";
+          cancel.textContent = "取消";
+
+          save.onclick = function(){
+            var v = trimText(input.value);
+            if(!v) return;
+            var latest = values.slice();
+            latest[index] = v;
+            if(onSave(latest)) rerenderAll();
+          };
+
+          cancel.onclick = rerenderAll;
+
+          row.appendChild(input);
+          row.appendChild(save);
+          row.appendChild(cancel);
+        };
+
+        del.onclick = function(){
+          var latest = values.slice();
+          latest.splice(index,1);
+          if(onSave(latest)) rerenderAll();
+        };
+
+        row.appendChild(text);
+        row.appendChild(up);
+        row.appendChild(down);
+        row.appendChild(edit);
+        row.appendChild(del);
+        box.appendChild(row);
+      })(i,values[i]);
+    }
+  }
+
+  function renderActivityOptionList(){
+    var vals = readActivityOptions();
+    renderEditableList(
+      "activityOptionList",
+      vals,
+      writeActivityOptions,
+      function(){
+        renderActivityChips();
+        renderActivityOptionList();
+      }
+    );
+  }
+
+  function renderBeforeOptionList(){
+    var vals = readBeforeOptions();
+    renderEditableList(
+      "beforeOptionList",
+      vals,
+      writeBeforeOptions,
+      function(){
+        beforeValue = "";
+        renderBeforeChips();
+        renderBeforeOptionList();
+      }
+    );
+  }
+
+  function renderAfterOptionList(){
+    var vals = readAfterOptions();
+    renderEditableList(
+      "afterOptionList",
+      vals,
+      writeAfterOptions,
+      function(){
+        afterValue = "";
+        renderAfterChips();
+        renderAfterOptionList();
+      }
+    );
+  }
+
+  function resetEntry(){
+    beforeValue = "";
+    afterValue = "";
+    scoreValue = 0;
+    startedAt = "";
+    el("activity").value = "";
+    el("beforeCustom").value = "";
+    el("afterCustom").value = "";
+    clearSelectedChips("activityChips");
+    clearSelectedChips("beforeChips");
+    clearSelectedChips("afterChips");
+
+    var scores = document.querySelectorAll(".scoreBtn:not(.editScoreBtn)");
+    for(var i=0;i<scores.length;i++) scores[i].className = "scoreBtn";
+    if(scores[0]) scores[0].className = "scoreBtn active";
+
+    el("afterSection").className = "card hidden";
+    el("startedNotice").className = "status hidden";
+    el("startButton").disabled = false;
+    el("startButton").textContent = "取り組む";
+  }
+
+  function closeEdit(){
+    editingId = null;
+    el("editSection").className = "card hidden";
+  }
+
+  function setEditScore(score){
+    editScoreValue = score;
+    var btns = document.getElementsByClassName("editScoreBtn");
+    for(var i=0;i<btns.length;i++){
+      var s = parseInt(btns[i].getAttribute("data-edit-score"),10);
+      btns[i].className = (s===score) ? "scoreBtn editScoreBtn active" : "scoreBtn editScoreBtn";
+    }
+  }
+
+  function beginEdit(id){
+    var data = readData();
+    var found = null;
+    for(var i=0;i<data.length;i++){
+      if(String(data[i].id)===String(id)){ found=data[i]; break; }
+    }
+    if(!found) return;
+
+    editingId = String(found.id);
+    el("editActivity").value = found.activity || "";
+    el("editBefore").value = found.before || "";
+    el("editAfter").value = found.after || "";
+    setEditScore(Number(found.score)||0);
+
+    var dt = found.savedAt ? new Date(found.savedAt) : null;
+    el("editDate").textContent = (dt && !isNaN(dt.getTime())) ? formatDateTime(dt) : "";
+    el("editSection").className = "card";
+
+    try{ el("editSection").scrollIntoView({behavior:"smooth",block:"start"}); }
+    catch(e){ window.scrollTo(0,el("editSection").offsetTop); }
+  }
+
+  function deleteOneNow(id){
+    var data = readData();
+    var next = [];
+    for(var i=0;i<data.length;i++){
+      if(String(data[i].id)!==String(id)) next.push(data[i]);
+    }
+    if(next.length===data.length){ showActionNotice("削除対象が見つかりませんでした"); return; }
+
+    if(writeData(next)){
+      if(String(editingId)===String(id)) closeEdit();
+      renderHistory();
+      showActionNotice("記録を削除しました");
+    }else{
+      showActionNotice("削除できませんでした");
+    }
+  }
+
+  function renderHistory(){
+    var data = readData();
+    el("count").textContent = data.length+"件";
+    var box = el("history");
+    box.innerHTML = "";
+
+    if(data.length===0){
+      var empty = document.createElement("div");
+      empty.className = "small";
+      empty.textContent = "まだ記録はありません。";
+      box.appendChild(empty);
+      return;
+    }
+
+    var max = Math.min(data.length,30);
+    var currentDateKey = "";
+    var currentGroup = null;
+
+    for(var i=0;i<max;i++){
+      (function(x){
+        var dt = x.savedAt ? new Date(x.savedAt) : null;
+        var validDate = dt && !isNaN(dt.getTime());
+        var dateKey = validDate
+          ? dt.getFullYear()+"-"+two(dt.getMonth()+1)+"-"+two(dt.getDate())
+          : "unknown";
+
+        if(dateKey !== currentDateKey){
+          currentDateKey = dateKey;
+
+          currentGroup = document.createElement("div");
+          currentGroup.className = "historyDateGroup";
+
+          var dateHeader = document.createElement("div");
+          dateHeader.className = "historyDateHeader";
+          dateHeader.textContent = validDate ? formatHistoryDate(dt) : "日付不明";
+
+          currentGroup.appendChild(dateHeader);
+          box.appendChild(currentGroup);
+        }
+
+        var item = document.createElement("div");
+        item.className = "historyItem";
+
+        var top = document.createElement("div");
+        top.className = "toprow";
+
+        var title = document.createElement("div");
+        title.className = "historyTitle";
+        title.textContent = (x.activity||"未記入")+"　"+x.score+"/3";
+
+        var time = document.createElement("div");
+        time.className = "small";
+        time.style.marginTop = "0";
+        time.style.whiteSpace = "nowrap";
+        time.textContent = validDate ? formatHistoryTime(dt) : "";
+
+        top.appendChild(title);
+        top.appendChild(time);
+        item.appendChild(top);
+
+        var line1 = document.createElement("div");
+        line1.className = "small";
+        line1.textContent = "前："+(x.before||"");
+        item.appendChild(line1);
+
+        var line2 = document.createElement("div");
+        line2.className = "small";
+        line2.textContent = "後："+(x.after||"");
+        item.appendChild(line2);
+
+        var actions = document.createElement("div");
+        actions.className = "itemActions";
+
+        var edit = document.createElement("button");
+        edit.type = "button";
+        edit.className = "miniBtn";
+        edit.textContent = "編集";
+        edit.onclick = function(){ beginEdit(x.id); };
+
+        var del = document.createElement("button");
+        del.type = "button";
+        del.className = "miniDanger";
+        del.textContent = "削除";
+
+        var confirmDel = document.createElement("button");
+        confirmDel.type = "button";
+        confirmDel.className = "miniConfirm hidden";
+        confirmDel.textContent = "本当に削除";
+
+        var cancelDel = document.createElement("button");
+        cancelDel.type = "button";
+        cancelDel.className = "miniBtn hidden";
+        cancelDel.textContent = "やめる";
+
+        del.onclick = function(){
+          del.className = "miniDanger hidden";
+          edit.className = "miniBtn hidden";
+          confirmDel.className = "miniConfirm";
+          cancelDel.className = "miniBtn";
+        };
+
+        cancelDel.onclick = function(){
+          confirmDel.className = "miniConfirm hidden";
+          cancelDel.className = "miniBtn hidden";
+          del.className = "miniDanger";
+          edit.className = "miniBtn";
+        };
+
+        confirmDel.onclick = function(){ deleteOneNow(x.id); };
+
+        actions.appendChild(edit);
+        actions.appendChild(del);
+        actions.appendChild(confirmDel);
+        actions.appendChild(cancelDel);
+        item.appendChild(actions);
+
+        currentGroup.appendChild(item);
+      })(data[i]);
+    }
+  }
+
+
+  function cleanAfterCategory(value){
+    var v = trimText(value);
+    return v || "未記入";
+  }
+
+  function dayKeyFromDate(d){
+    return d.getFullYear()+"-"+two(d.getMonth()+1)+"-"+two(d.getDate());
+  }
+
+  function monthKeyFromDate(d){
+    return d.getFullYear()+"-"+two(d.getMonth()+1);
+  }
+
+  function labelDayKey(key){
+    var p = key.split("-");
+    if(p.length !== 3) return key;
+    var d = new Date(Number(p[0]),Number(p[1])-1,Number(p[2]));
+    return Number(p[1])+"/"+Number(p[2])+"（"+weekdayJP(d)+"）";
+  }
+
+  function labelMonthKey(key){
+    var p = key.split("-");
+    if(p.length !== 2) return key;
+    return p[0]+"/"+Number(p[1]);
+  }
+
+  function getValidRecordsAscending(){
+    var data = readData();
+    var out = [];
+    for(var i=0;i<data.length;i++){
+      var x = data[i];
+      var dt = x.savedAt ? new Date(x.savedAt) : null;
+      if(dt && !isNaN(dt.getTime())){
+        out.push({record:x,date:dt,category:cleanAfterCategory(x.after)});
+      }
+    }
+    out.sort(function(a,b){ return a.date.getTime()-b.date.getTime(); });
+    return out;
+  }
+
+  function countAllCategories(records){
+    var counts = {};
+    for(var i=0;i<records.length;i++){
+      var c = records[i].category;
+      counts[c] = (counts[c]||0)+1;
+    }
+    return counts;
+  }
+
+  function sortedCategoryEntries(counts){
+    var arr = [];
+    for(var k in counts){
+      if(Object.prototype.hasOwnProperty.call(counts,k)){
+        arr.push({name:k,count:counts[k]});
+      }
+    }
+    arr.sort(function(a,b){
+      if(b.count !== a.count) return b.count-a.count;
+      return a.name.localeCompare(b.name,"ja");
+    });
+    return arr;
+  }
+
+  function renderSummary(records){
+    var box = el("statsSummary");
+    box.innerHTML = "";
+
+    var total = records.length;
+    var cats = sortedCategoryEntries(countAllCategories(records));
+
+    var totalBadge = document.createElement("span");
+    totalBadge.className = "badge";
+    totalBadge.textContent = "総記録 "+total+"件";
+    box.appendChild(totalBadge);
+
+    var catBadge = document.createElement("span");
+    catBadge.className = "badge";
+    catBadge.textContent = "内容 "+cats.length+"種類";
+    box.appendChild(catBadge);
+  }
+
+  function appendCategoryLines(container, entries, maxCount, prefixText){
+    for(var i=0;i<entries.length;i++){
+      var e = entries[i];
+
+      var line = document.createElement("div");
+      line.className = "statLine";
+
+      var left = document.createElement("div");
+
+      var name = document.createElement("div");
+      name.className = "statName";
+      name.textContent = e.name;
+
+      var track = document.createElement("div");
+      track.className = "statBarTrack";
+
+      var fill = document.createElement("div");
+      fill.className = "statBarFill";
+      var pct = maxCount > 0 ? Math.max(2, Math.round((e.count/maxCount)*100)) : 0;
+      fill.style.width = pct+"%";
+
+      track.appendChild(fill);
+      left.appendChild(name);
+      left.appendChild(track);
+
+      var count = document.createElement("div");
+      count.className = "statCount";
+      count.textContent = (prefixText||"")+e.count+"件";
+
+      line.appendChild(left);
+      line.appendChild(count);
+      container.appendChild(line);
+    }
+  }
+
+  function renderAllStats(records){
+    var content = el("statsContent");
+    content.innerHTML = "";
+
+    var counts = countAllCategories(records);
+    var entries = sortedCategoryEntries(counts);
+
+    if(entries.length===0){
+      var empty = document.createElement("div");
+      empty.className = "small";
+      empty.textContent = "まだ集計できる記録がありません。";
+      content.appendChild(empty);
+      return;
+    }
+
+    var maxCount = entries[0].count;
+    appendCategoryLines(content,entries,maxCount,"");
+  }
+
+  function renderPeriodStats(records,mode){
+    var content = el("statsContent");
+    content.innerHTML = "";
+
+    if(records.length===0){
+      var empty = document.createElement("div");
+      empty.className = "small";
+      empty.textContent = "まだ集計できる記録がありません。";
+      content.appendChild(empty);
+      return;
+    }
+
+    var periods = {};
+    var periodOrder = [];
+
+    for(var i=0;i<records.length;i++){
+      var key = mode==="daily" ? dayKeyFromDate(records[i].date) : monthKeyFromDate(records[i].date);
+      if(!periods[key]){
+        periods[key] = [];
+        periodOrder.push(key);
+      }
+      periods[key].push(records[i]);
+    }
+
+    var cumulative = {};
+    var cumulativeTotal = 0;
+    var periodBlocks = [];
+
+    for(var p=0;p<periodOrder.length;p++){
+      var key = periodOrder[p];
+      var periodRecords = periods[key];
+
+      var addedCounts = {};
+      for(var r=0;r<periodRecords.length;r++){
+        var c = periodRecords[r].category;
+        addedCounts[c] = (addedCounts[c]||0)+1;
+        cumulative[c] = (cumulative[c]||0)+1;
+        cumulativeTotal += 1;
+      }
+
+      var snapshot = {};
+      for(var k in cumulative){
+        if(Object.prototype.hasOwnProperty.call(cumulative,k)) snapshot[k]=cumulative[k];
+      }
+
+      periodBlocks.push({
+        key:key,
+        periodCount:periodRecords.length,
+        cumulativeTotal:cumulativeTotal,
+        counts:snapshot,
+        added:addedCounts
+      });
+    }
+
+    periodBlocks.reverse();
+
+    var maxCumulative = 0;
+    for(var b=0;b<periodBlocks.length;b++){
+      var es = sortedCategoryEntries(periodBlocks[b].counts);
+      if(es.length && es[0].count > maxCumulative) maxCumulative = es[0].count;
+    }
+
+    for(var j=0;j<periodBlocks.length;j++){
+      var block = periodBlocks[j];
+
+      var wrap = document.createElement("div");
+      wrap.className = "statsPeriod";
+
+      var head = document.createElement("div");
+      head.className = "statsPeriodHead";
+
+      var title = document.createElement("div");
+      title.className = "statsPeriodTitle";
+      title.textContent = mode==="daily" ? labelDayKey(block.key) : labelMonthKey(block.key);
+
+      var total = document.createElement("div");
+      total.className = "statsPeriodTotal";
+      total.textContent = "この期間 +"+block.periodCount+" / 累積 "+block.cumulativeTotal;
+
+      head.appendChild(title);
+      head.appendChild(total);
+      wrap.appendChild(head);
+
+      var entries = sortedCategoryEntries(block.counts);
+      for(var e=0;e<entries.length;e++){
+        var item = entries[e];
+        var added = block.added[item.name] || 0;
+
+        var line = document.createElement("div");
+        line.className = "statLine";
+
+        var left = document.createElement("div");
+        var name = document.createElement("div");
+        name.className = "statName";
+        name.textContent = item.name + (added ? "　(+"+added+")" : "");
+
+        var track = document.createElement("div");
+        track.className = "statBarTrack";
+        var fill = document.createElement("div");
+        fill.className = "statBarFill";
+        var pct = maxCumulative > 0 ? Math.max(2,Math.round((item.count/maxCumulative)*100)) : 0;
+        fill.style.width = pct+"%";
+        track.appendChild(fill);
+
+        left.appendChild(name);
+        left.appendChild(track);
+
+        var count = document.createElement("div");
+        count.className = "statCount";
+        count.textContent = item.count+"件";
+
+        line.appendChild(left);
+        line.appendChild(count);
+        wrap.appendChild(line);
+      }
+
+      content.appendChild(wrap);
+    }
+  }
+
+  function setStatsMode(mode){
+    statsMode = mode;
+
+    el("statsDailyTab").className = mode==="daily" ? "statsTab active" : "statsTab";
+    el("statsMonthlyTab").className = mode==="monthly" ? "statsTab active" : "statsTab";
+    el("statsAllTab").className = mode==="all" ? "statsTab active" : "statsTab";
+
+    var records = getValidRecordsAscending();
+    renderSummary(records);
+
+    if(mode==="all"){
+      renderAllStats(records);
+      el("statsNote").textContent = "全期間は、内容ごとの合計件数です。";
+    }else if(mode==="daily"){
+      renderPeriodStats(records,"daily");
+      el("statsNote").textContent = "日別は、各日時点までの累積件数です。括弧内の +数字 はその日に新しく増えた件数です。";
+    }else{
+      renderPeriodStats(records,"monthly");
+      el("statsNote").textContent = "月別は、各月末時点までの累積件数です。括弧内の +数字 はその月に新しく増えた件数です。";
+    }
+  }
+
+  function showStats(){
+    closeEdit();
+    el("mainScreen").className = "hidden";
+    el("historyScreen").className = "hidden";
+    el("optionsScreen").className = "hidden";
+    el("statsScreen").className = "";
+    setStatsMode(statsMode);
+    window.scrollTo(0,0);
+  }
+
+  function showMain(){
+    el("optionsScreen").className = "hidden";
+    el("historyScreen").className = "hidden";
+    el("statsScreen").className = "hidden";
+    el("mainScreen").className = "";
+    renderActivityChips();
+    renderBeforeChips();
+    renderAfterChips();
+    window.scrollTo(0,0);
+  }
+
+  function showOptions(){
+    closeEdit();
+    el("mainScreen").className = "hidden";
+    el("historyScreen").className = "hidden";
+    el("statsScreen").className = "hidden";
+    el("optionsScreen").className = "";
+    renderActivityOptionList();
+    renderBeforeOptionList();
+    renderAfterOptionList();
+    window.scrollTo(0,0);
+  }
+
+  function showHistory(){
+    closeEdit();
+    el("mainScreen").className = "hidden";
+    el("optionsScreen").className = "hidden";
+    el("statsScreen").className = "hidden";
+    el("historyScreen").className = "";
+    renderHistory();
+    window.scrollTo(0,0);
+  }
+
+  var scoreButtons = document.querySelectorAll(".scoreBtn:not(.editScoreBtn)");
+  for(var s=0;s<scoreButtons.length;s++){
+    scoreButtons[s].onclick = function(){
+      for(var i=0;i<scoreButtons.length;i++) scoreButtons[i].className = "scoreBtn";
+      this.className = "scoreBtn active";
+      scoreValue = parseInt(this.getAttribute("data-score"),10);
+    };
+  }
+  if(scoreButtons[0]) scoreButtons[0].className = "scoreBtn active";
+
+  var editScoreButtons = document.getElementsByClassName("editScoreBtn");
+  for(var es=0;es<editScoreButtons.length;es++){
+    editScoreButtons[es].onclick = function(){
+      setEditScore(parseInt(this.getAttribute("data-edit-score"),10));
+    };
+  }
+
+  el("activity").addEventListener("input", function(){
+    clearSelectedChips("activityChips");
+  });
+
+  el("startButton").onclick = function(){
+    var activity = trimText(el("activity").value);
+    if(!activity){ showActionNotice("取り組む項目を入力してください"); return; }
+
+    var custom = trimText(el("beforeCustom").value);
+    if(custom) beforeValue = custom;
+    if(!beforeValue) beforeValue = "未記入";
+
+    startedAt = new Date().toISOString();
+    saveDraft();
+    el("afterSection").className = "card";
+    el("startedNotice").className = "status";
+    el("startButton").disabled = true;
+    el("startButton").textContent = "取り組み中";
+
+    setTimeout(function(){
+      try{ el("afterSection").scrollIntoView({behavior:"smooth",block:"start"}); }
+      catch(e){ window.scrollTo(0,el("afterSection").offsetTop); }
+    },50);
+  };
+
+  el("saveButton").onclick = function(){
+    var customAfter = trimText(el("afterCustom").value);
+    if(customAfter) afterValue = customAfter;
+    if(!afterValue) afterValue = "未記入";
+
+    var now = new Date();
+    var entry = {
+      id:String(now.getTime()),
+      activity:trimText(el("activity").value)||"未記入",
+      before:beforeValue,
+      after:afterValue,
+      score:scoreValue,
+      startedAt:startedAt,
+      savedAt:now.toISOString()
+    };
+
+    var data = readData();
+    data.unshift(entry);
+    if(data.length>500) data=data.slice(0,500);
+
+    if(!writeData(data)){ showActionNotice("保存できませんでした"); return; }
+
+    clearDraft();
+    resetEntry();
+    closeEdit();
+    renderHistory();
+    showHistory();
+  };
+
+  el("saveEditButton").onclick = function(){
+    if(editingId===null) return;
+    var data = readData();
+    var updated = false;
+
+    for(var i=0;i<data.length;i++){
+      if(String(data[i].id)===String(editingId)){
+        data[i].activity = trimText(el("editActivity").value)||"未記入";
+        data[i].before = trimText(el("editBefore").value)||"未記入";
+        data[i].after = trimText(el("editAfter").value)||"未記入";
+        data[i].score = editScoreValue;
+        updated = true;
+        break;
+      }
+    }
+
+    if(updated && writeData(data)){
+      closeEdit();
+      renderHistory();
+      showActionNotice("変更を保存しました");
+    }else{
+      showActionNotice("変更を保存できませんでした");
+    }
+  };
+
+  el("cancelEditButton").onclick = closeEdit;
+  el("cancelButton").onclick = function(){
+    clearDraft();
+    resetEntry();
+    window.scrollTo(0,0);
+  };
+
+  el("addActivityOptionButton").onclick = function(){
+    var value = trimText(el("newActivityOption").value);
+    if(!value) return;
+
+    var arr = readActivityOptions();
+    for(var i=0;i<arr.length;i++){
+      if(arr[i]===value) return;
+    }
+    arr.push(value);
+
+    if(writeActivityOptions(arr)){
+      el("newActivityOption").value = "";
+      renderActivityOptionList();
+      renderActivityChips();
+    }
+  };
+
+  el("addBeforeOptionButton").onclick = function(){
+    var value = trimText(el("newBeforeOption").value);
+    if(!value) return;
+
+    var arr = readBeforeOptions();
+    for(var i=0;i<arr.length;i++){
+      if(arr[i]===value) return;
+    }
+    arr.push(value);
+
+    if(writeBeforeOptions(arr)){
+      el("newBeforeOption").value = "";
+      renderBeforeOptionList();
+      renderBeforeChips();
+    }
+  };
+
+  el("addAfterOptionButton").onclick = function(){
+    var value = trimText(el("newAfterOption").value);
+    if(!value) return;
+
+    var arr = readAfterOptions();
+    for(var i=0;i<arr.length;i++){
+      if(arr[i]===value) return;
+    }
+    arr.push(value);
+
+    if(writeAfterOptions(arr)){
+      el("newAfterOption").value = "";
+      renderAfterOptionList();
+      renderAfterChips();
+    }
+  };
+
+  el("openStatsButton").onclick = showStats;
+  el("openHistoryButton").onclick = showHistory;
+  el("openOptionsButton").onclick = showOptions;
+  el("statsBackButton").onclick = showMain;
+  el("historyBackButton").onclick = showMain;
+  el("backButton").onclick = showMain;
+
+  el("statsDailyTab").onclick = function(){ setStatsMode("daily"); };
+  el("statsMonthlyTab").onclick = function(){ setStatsMode("monthly"); };
+  el("statsAllTab").onclick = function(){ setStatsMode("all"); };
+
+
+  el("deleteButton").onclick = function(){
+    var btn = el("deleteButton");
+    if(btn.getAttribute("data-confirm")==="1"){
+      localStorage.removeItem(DATA_KEY);
+      clearDraft();
+      btn.setAttribute("data-confirm","0");
+      btn.textContent = "端末内の記録をすべて削除";
+      resetEntry();
+      closeEdit();
+      renderHistory();
+      showActionNotice("すべての記録を削除しました");
+    }else{
+      btn.setAttribute("data-confirm","1");
+      btn.textContent = "もう一度押すと全削除";
+      setTimeout(function(){
+        btn.setAttribute("data-confirm","0");
+        btn.textContent = "端末内の記録をすべて削除";
+      },4000);
+    }
+  };
+
+  showToday();
+  testStorage();
+  renderActivityChips();
+  renderBeforeChips();
+  renderAfterChips();
+  renderHistory();
+  restoreDraft();
+})();
+</script>
+
+<script>
+if ("serviceWorker" in navigator && location.protocol === "https:") {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("./sw.js").catch(function () {});
+  });
+}
+</script>
+
+</body>
+</html>
