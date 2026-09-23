@@ -430,14 +430,14 @@ input[type="text"]{
   <button id="backButton" class="backButton" type="button">← 戻る</button>
   <h1 style="margin-top:4px">オプション</h1>
   <p class="sub">よく使う項目と、前後の候補を編集できます。</p>
-  <p class="small">バージョン：2026.09.24-3</p>
+  <p class="small">バージョン：2026.09.24-4</p>
 
 
   <section class="card">
     <div class="label">THEME</div>
     <div class="question" style="font-size:17px">テーマカラー</div>
     <div id="themeGrid" class="themeGrid"></div>
-    <p class="small">選んだ色はボタンやカレンダーの記録日に反映されます。</p>
+    <p class="small">背景・カード・ボタン・カレンダーなど、アプリ全体の配色が切り替わります。</p>
   </section>
 
   <section class="card">
@@ -561,12 +561,84 @@ input[type="text"]{
   function trimText(s){ return String(s || "").replace(/^\s+|\s+$/g,""); }
 
   var THEMES = {
-    graphite:{label:"黒",accent:"#111111",accentText:"#ffffff",accentSoft:"#e6e6e8"},
-    blue:{label:"青",accent:"#2563eb",accentText:"#ffffff",accentSoft:"#dbeafe"},
-    green:{label:"緑",accent:"#16803b",accentText:"#ffffff",accentSoft:"#dcfce7"},
-    purple:{label:"紫",accent:"#7c3aed",accentText:"#ffffff",accentSoft:"#ede9fe"},
-    orange:{label:"橙",accent:"#c45a09",accentText:"#ffffff",accentSoft:"#ffedd5"},
-    rose:{label:"桃",accent:"#be185d",accentText:"#ffffff",accentSoft:"#fce7f3"}
+    graphite:{
+      label:"グレー",
+      light:{
+        bg:"#f5f5f7",card:"#ffffff",text:"#111111",sub:"#6e6e73",
+        line:"#dddddf",soft:"#ececf0",accent:"#111111",
+        accentText:"#ffffff",accentSoft:"#e6e6e8"
+      },
+      dark:{
+        bg:"#0d0d0f",card:"#18181b",text:"#f5f5f7",sub:"#a1a1a6",
+        line:"#343438",soft:"#28282c",accent:"#f5f5f7",
+        accentText:"#111111",accentSoft:"#303035"
+      }
+    },
+    blue:{
+      label:"青",
+      light:{
+        bg:"#f2f7ff",card:"#ffffff",text:"#10213a",sub:"#5f6f86",
+        line:"#cfddf0",soft:"#e6effb",accent:"#2563eb",
+        accentText:"#ffffff",accentSoft:"#dbeafe"
+      },
+      dark:{
+        bg:"#0c1420",card:"#121d2c",text:"#eef5ff",sub:"#a7b7cb",
+        line:"#263a54",soft:"#1b2a3d",accent:"#60a5fa",
+        accentText:"#08111d",accentSoft:"#183758"
+      }
+    },
+    green:{
+      label:"緑",
+      light:{
+        bg:"#f3faf5",card:"#ffffff",text:"#13311f",sub:"#617566",
+        line:"#cfdfd3",soft:"#e6f2e9",accent:"#16803b",
+        accentText:"#ffffff",accentSoft:"#dcfce7"
+      },
+      dark:{
+        bg:"#0c1710",card:"#132019",text:"#edf8f0",sub:"#a9bcae",
+        line:"#284331",soft:"#1d3024",accent:"#4ade80",
+        accentText:"#07140b",accentSoft:"#183e25"
+      }
+    },
+    purple:{
+      label:"紫",
+      light:{
+        bg:"#f7f3ff",card:"#ffffff",text:"#291842",sub:"#75668a",
+        line:"#ddd0ee",soft:"#eee6f8",accent:"#7c3aed",
+        accentText:"#ffffff",accentSoft:"#ede9fe"
+      },
+      dark:{
+        bg:"#15101c",card:"#21172c",text:"#f6efff",sub:"#bcacd0",
+        line:"#45345b",soft:"#312442",accent:"#a78bfa",
+        accentText:"#130d1d",accentSoft:"#3b2a57"
+      }
+    },
+    orange:{
+      label:"橙",
+      light:{
+        bg:"#fff7ef",card:"#ffffff",text:"#3b2514",sub:"#816b59",
+        line:"#ead7c3",soft:"#f7eadb",accent:"#c45a09",
+        accentText:"#ffffff",accentSoft:"#ffedd5"
+      },
+      dark:{
+        bg:"#1b120b",card:"#281a10",text:"#fff4ea",sub:"#c8ae98",
+        line:"#513824",soft:"#3b291b",accent:"#fb923c",
+        accentText:"#1c0d03",accentSoft:"#57301b"
+      }
+    },
+    rose:{
+      label:"桃",
+      light:{
+        bg:"#fff4f8",card:"#ffffff",text:"#3d1728",sub:"#826577",
+        line:"#ecd1dc",soft:"#f8e7ee",accent:"#be185d",
+        accentText:"#ffffff",accentSoft:"#fce7f3"
+      },
+      dark:{
+        bg:"#1b0f15",card:"#291720",text:"#fff0f6",sub:"#c9a8b7",
+        line:"#553144",soft:"#3d2230",accent:"#f472b6",
+        accentText:"#1b0710",accentSoft:"#5b2940"
+      }
+    }
   };
 
   function readTheme(){
@@ -577,17 +649,30 @@ input[type="text"]{
     }catch(e){ return "graphite"; }
   }
 
+  function getThemePalette(name){
+    if(!THEMES[name]) name = "graphite";
+    var dark = window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    return dark ? THEMES[name].dark : THEMES[name].light;
+  }
+
   function applyTheme(name){
     if(!THEMES[name]) name = "graphite";
-    var t = THEMES[name];
+    var t = getThemePalette(name);
     var root = document.documentElement;
 
+    root.style.setProperty("--bg",t.bg);
+    root.style.setProperty("--card",t.card);
+    root.style.setProperty("--text",t.text);
+    root.style.setProperty("--sub",t.sub);
+    root.style.setProperty("--line",t.line);
+    root.style.setProperty("--soft",t.soft);
     root.style.setProperty("--accent",t.accent);
     root.style.setProperty("--accentText",t.accentText);
     root.style.setProperty("--accentSoft",t.accentSoft);
 
     var meta = document.querySelector('meta[name="theme-color"]');
-    if(meta) meta.setAttribute("content",t.accent);
+    if(meta) meta.setAttribute("content",t.bg);
 
     if(storageOK){
       try{ localStorage.setItem(THEME_KEY,name); }catch(e){}
@@ -607,22 +692,36 @@ input[type="text"]{
       if(!Object.prototype.hasOwnProperty.call(THEMES,key)) continue;
 
       (function(themeKey){
-        var t = THEMES[themeKey];
+        var theme = THEMES[themeKey];
+        var palette = getThemePalette(themeKey);
+
         var b = document.createElement("button");
         b.type = "button";
         b.className = "themeButton" + (themeKey===active ? " active" : "");
 
         var dot = document.createElement("span");
         dot.className = "themeDot";
-        dot.style.background = t.accent;
+        dot.style.background = palette.accent;
 
-        var textNode = document.createTextNode(t.label);
+        var textNode = document.createTextNode(theme.label);
         b.appendChild(dot);
         b.appendChild(textNode);
 
         b.onclick = function(){ applyTheme(themeKey); };
         box.appendChild(b);
       })(key);
+    }
+  }
+
+  if(window.matchMedia){
+    var colorModeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    var handleThemeModeChange = function(){
+      applyTheme(readTheme());
+    };
+    if(colorModeQuery.addEventListener){
+      colorModeQuery.addEventListener("change",handleThemeModeChange);
+    }else if(colorModeQuery.addListener){
+      colorModeQuery.addListener(handleThemeModeChange);
     }
   }
 
